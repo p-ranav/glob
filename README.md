@@ -9,9 +9,10 @@
 ## Table of Contents
 
 - [Quick Start](#quick-start)
+  * [Build Library and Standalone Sample](#build-library-and-standalone-sample)
 - [API](#api)
 - [Wildcards](#wildcards)
-- [Example](#example)
+- [Examples](#examples)
   * [Match file extensions](#match-file-extensions)
   * [Match files in absolute pathnames](#match-files-in-absolute-pathnames)
   * [Wildcards: Match a range of characters listed in brackets ('[]')](#wildcards-match-a-range-of-characters-listed-in-brackets-)
@@ -19,7 +20,7 @@
   * [Wildcards: Match any one character with question mark ('?')](#wildcards-match-any-one-character-with-question-mark-)
   * [Case sensitivity](#case-sensitivity)
 - [Contributing](#contributing)
-- [License)(#license)
+- [License](#license)
 
 ## Quick Start
 
@@ -29,11 +30,14 @@
   - If you can't use `C++17`, you can integrate [gulrak/filesystem](https://github.com/gulrak/filesystem) with minimal effort.
 * MIT License
 
+### Build Library and Standalone Sample
+
 ```bash
-git clone https://github.com/p-ranav/glob
-cd glob
-mkdir build && cd build
-cmake .. && make
+cmake -Hall -Bbuild
+cmake --build build
+
+# run standalone `glob` sample
+./build/standalone/glob --help
 ```
 
 ## API
@@ -77,28 +81,7 @@ vector<filesystem::path> rglob(vector<string> pathnames);
 | `[-]` | any character in the range listed in brackets | `[A-Z]*` matches files starting with capital letters |
 | `[!]` | any character listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
 
-## Example
-
-Below is a short program that runs `glob` and prints matching path names.
-
-***NOTE*** Replace `glob` with `rglob` if you want to glob recursively.
-
-```cpp
-#include <glob/glob.h>
-#include <iostream>
-
-int main(int argc, char *argv[]) {
-  if (argc != 2) {
-    std::cerr << "Usage: ./exe <pattern>\n";
-    return EXIT_FAILURE;
-  }
-
-  // Run glob on the vector of patterns
-  for (auto &f : glob::glob(argv[1])) {
-    std::cout << f << "\n";
-  }
-}
-```
+## Examples
 
 ### Match file extensions
 
@@ -118,19 +101,19 @@ foo@bar:~$ tree
 
 3 directories, 7 files
 
-foo@bar:~$ ./main "**/*.hpp"
+foo@bar:~$ ./glob -i "**/*.hpp"
 "test/doctest.hpp"
 
-foo@bar:~$ ./main "**/**/*.hpp"
+foo@bar:~$ ./glob -i "**/**/*.hpp"
 "include/foo/baz.hpp"
 "include/foo/foo.hpp"
 "include/foo/bar.hpp"
 ```
 
-***NOTE*** If you use `rglob` instead of `glob`:
+***NOTE*** If you run glob recursively, i.e., using `rglob`:
 
 ```console
-foo@bar:~$ ./main "**/*.hpp"
+foo@bar:~$ ./glob -r -i "**/*.hpp"
 "test/doctest.hpp"
 "include/foo/baz.hpp"
 "include/foo/foo.hpp"
@@ -140,7 +123,7 @@ foo@bar:~$ ./main "**/*.hpp"
 ### Match files in absolute pathnames
 
 ```console
-foo@bar:~$ ./main '/usr/local/include/nc*.h'
+foo@bar:~$ ./glob -i '/usr/local/include/nc*.h'
 "/usr/local/include/ncCheck.h"
 "/usr/local/include/ncGroupAtt.h"
 "/usr/local/include/ncUshort.h"
@@ -162,13 +145,13 @@ foo@bar:~$ ./main '/usr/local/include/nc*.h'
 foo@bar:~$ ls test_files_02
 1.txt 2.txt 3.txt 4.txt
 
-foo@bar:~$ ./main 'test_files_02/[0-9].txt'
+foo@bar:~$ ./glob -i 'test_files_02/[0-9].txt'
 "test_files_02/4.txt"
 "test_files_02/3.txt"
 "test_files_02/2.txt"
 "test_files_02/1.txt"
 
-foo@bar:~$ ./main 'test_files_02/[1-2]*'
+foo@bar:~$ ./glob -i 'test_files_02/[1-2]*'
 "test_files_02/2.txt"
 "test_files_02/1.txt"
 ```
@@ -177,7 +160,7 @@ foo@bar:~$ ./main 'test_files_02/[1-2]*'
 foo@bar:~$ ls test_files_03
 file1.txt file2.txt file3.txt file4.txt
 
-foo@bar:~$ ./main 'test_files_03/file[0-9].*'
+foo@bar:~$ ./glob -i 'test_files_03/file[0-9].*'
 "test_files_03/file2.txt"
 "test_files_03/file3.txt"
 "test_files_03/file1.txt"
@@ -190,14 +173,14 @@ foo@bar:~$ ./main 'test_files_03/file[0-9].*'
 foo@bar:~$ ls test_files_01
 __init__.py     bar.py      foo.py
 
-foo@bar:~$ ./main 'test_files_01/*[!__init__].py'
+foo@bar:~$ ./glob -i 'test_files_01/*[!__init__].py'
 "test_files_01/bar.py"
 "test_files_01/foo.py"
 
-foo@bar:~$ ./main 'test_files_01/*[!__init__][!bar].py'
+foo@bar:~$ ./glob -i 'test_files_01/*[!__init__][!bar].py'
 "test_files_01/foo.py"
 
-foo@bar:~$ ./main 'test_files_01/[!_]*.py'
+foo@bar:~$ ./glob -i 'test_files_01/[!_]*.py'
 "test_files_01/bar.py"
 "test_files_01/foo.py"
 ```
@@ -208,7 +191,7 @@ foo@bar:~$ ./main 'test_files_01/[!_]*.py'
 foo@bar:~$ ls test_files_02
 1.txt 2.txt 3.txt 4.txt
 
-foo@bar:~$ ./main 'test_files_02/?.txt'
+foo@bar:~$ ./glob -i 'test_files_02/?.txt'
 "test_files_02/4.txt"
 "test_files_02/3.txt"
 "test_files_02/2.txt"
@@ -219,7 +202,7 @@ foo@bar:~$ ./main 'test_files_02/?.txt'
 foo@bar:~$ ls test_files_03
 file1.txt file2.txt file3.txt file4.txt
 
-foo@bar:~$ ./main 'test_files_03/????[3-4].txt'
+foo@bar:~$ ./glob -i 'test_files_03/????[3-4].txt'
 "test_files_03/file3.txt"
 "test_files_03/file4.txt"
 ```
@@ -232,11 +215,17 @@ foo@bar:~$ ./main 'test_files_03/????[3-4].txt'
 foo@bar:~$ ls test_files_05
 file1.png file2.png file3.PNG file4.PNG
 
-foo@bar:~$ ./main 'test_files_05/*.png'
+foo@bar:~$ ./glob -i 'test_files_05/*.png'
 "test_files_05/file2.png"
 "test_files_05/file1.png"
 
-foo@bar:~$ ./main 'test_files_05/*.PNG'
+foo@bar:~$ ./glob -i 'test_files_05/*.PNG'
+"test_files_05/file3.PNG"
+"test_files_05/file4.PNG"
+
+foo@bar:~$ ./glob -i "test_files_05/*.png","test_files_05/*.PNG"
+"test_files_05/file2.png"
+"test_files_05/file1.png"
 "test_files_05/file3.PNG"
 "test_files_05/file4.PNG"
 ```
