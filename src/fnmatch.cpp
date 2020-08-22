@@ -1,9 +1,3 @@
-#if !(defined(__cplusplus) && __cplusplus >= 201703L && defined(__has_include))
-#if __has_include(<filesystem>)
-#include <glob/filesystem/fs_impl.hpp>
-#endif
-#endif
-
 #include <glob/fnmatch.hpp>
 
 namespace glob {
@@ -18,7 +12,7 @@ bool string_replace(std::string& str, const std::string& from, const std::string
   return true;
 }
 
-std::string translate_to_regex_string(const std::string& pattern) {
+std::string translate(const std::string& pattern) {
   std::size_t i = 0, n = pattern.size();
   std::string result_string;
 
@@ -127,12 +121,14 @@ std::string translate_to_regex_string(const std::string& pattern) {
 }
 
 std::regex compile_pattern(const std::string& pattern) {
-  return std::regex(translate_to_regex_string(pattern), std::regex::ECMAScript);
+  return std::regex(translate(pattern), std::regex::ECMAScript);
+}
+
 }
 
 std::vector<fs::path> filter(const std::vector<fs::path>& names, const std::string& pattern) {
   std::vector<fs::path> result;
-  auto regex = compile_pattern(pattern);
+  auto regex = details::compile_pattern(pattern);
   for (auto& name : names) {
     if (std::regex_match(name.string(), regex)) {
       result.push_back(name);
@@ -141,29 +137,14 @@ std::vector<fs::path> filter(const std::vector<fs::path>& names, const std::stri
   return result;
 }
 
-// Test whether FILENAME matches PATTERN, including case.
-// This is a version of fnmatch() which doesn't case-normalize
-//    its arguments.
 bool fnmatch_case(const fs::path& name, const std::string& pattern) {
-  return std::regex_match(name.string(), compile_pattern(pattern));
+  return std::regex_match(name.string(), details::compile_pattern(pattern));
 }
 
-// Test whether FILENAME matches PATTERN.
-// Patterns are Unix shell style:
-// *       matches everything
-// ?       matches any single character
-// [seq]   matches any character in seq
-// [!seq]  matches any char not in seq
-// An initial period in FILENAME is not special.
-// Both FILENAME and PATTERN are first case-normalized
-// if the operating system requires it.
-// If you don't want this, use fnmatchcase(FILENAME, PATTERN).
 bool fnmatch(const fs::path& name, const std::string& pattern) {
   auto name_normal = name.lexically_normal();
   auto pattern_normal = fs::path(pattern).lexically_normal();
   return fnmatch_case(name_normal, pattern_normal.string());
-}
-
 }
 
 }

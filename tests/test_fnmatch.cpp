@@ -2,7 +2,6 @@
 #include <glob/fnmatch.hpp>
 using doctest::test_suite;
 using namespace glob;
-using namespace glob::details;
 
 TEST_CASE("fnmatch can check patterns" * test_suite("fnmatch")) {
   REQUIRE(fnmatch("abc", "abc"));
@@ -72,7 +71,7 @@ TEST_CASE("fnmatch_case can filter for all items that match pattern" * test_suit
     fs::path("index.rst")
   };
 
-  const auto filtered = details::filter(files, pattern);
+  const auto filtered = filter(files, pattern);
   REQUIRE(filtered.size() == 4);
   REQUIRE(filtered[0].string() == "fnmatch_filter.py");
   REQUIRE(filtered[1].string() == "fnmatch_fnmatch.py");
@@ -89,7 +88,7 @@ TEST_CASE("fnmatch_case can filter for all items that match pattern" * test_suit
     fs::path("index.rst")
   };
 
-  const auto filtered = details::filter(files, pattern);
+  const auto filtered = filter(files, pattern);
   REQUIRE(filtered.size() == 2);
   REQUIRE(filtered[0].string() == "test1.py");
   REQUIRE(filtered[1].string() == "test2.py");

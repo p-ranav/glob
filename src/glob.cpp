@@ -1,6 +1,6 @@
 
 #include <functional>
-#include <glob/fnmatch.hpp>
+#include <glob/glob.hpp>
 
 namespace glob {
 
@@ -90,7 +90,7 @@ std::vector<fs::path> glob1(const fs::path& dirname, const std::string& pattern,
       }
     }
   }
-  return details::filter(filtered_names, pattern);
+  return filter(filtered_names, pattern);
 }
 
 std::vector<fs::path> glob0(const fs::path& dirname, const fs::path& basename, bool dironly) {
@@ -172,7 +172,7 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false, 
 
 }
 
-std::vector<fs::path> glob(const std::string &pathname, bool recursive = false) {
+std::vector<fs::path> glob(const std::string &pathname, bool recursive) {
   return details::glob(pathname, recursive);
 }
 

@@ -7,6 +7,6 @@ int main(int argc, char *argv[]) {
   }
 
   for (auto& f : glob::glob(argv[1], true)) {
-    std::cout << glob::fs::relative(f) << "\n";
+    std::cout << fs::relative(f) << "\n";
   }
 }
