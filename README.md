@@ -54,7 +54,7 @@ for (auto& p : glob::glob({"*.png", "*.jpg"})) {
   // do something with `p`
 }
 
-// Match recursively
+// Match recursively with `rglob`
 for (auto& p : glob::rglob("**/*.hpp")) {
   // do something with `p`
 }
