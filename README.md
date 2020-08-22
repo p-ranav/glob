@@ -46,17 +46,17 @@ cmake --build build
 
 ```cpp
 // Match on a single pattern
-for (auto& p : glob::glob("*.png")) {
+for (auto& p : glob::glob("~/.b*")) {                // e.g., .bash_history, .bashrc
   // do something with `p`
 }
 
 // Match on multiple patterns
-for (auto& p : glob::glob({"*.png", "*.jpg"})) {
+for (auto& p : glob::glob({"*.png", "*.jpg"})) {     // e.g., foo.png, bar.jpg
   // do something with `p`
 }
 
 // Match recursively with `rglob`
-for (auto& p : glob::rglob("**/*.hpp")) {
+for (auto& p : glob::rglob("**/*.hpp")) {            // e.g., include/foo.hpp, include/foo/bar.hpp
   // do something with `p`
 }
 ```
