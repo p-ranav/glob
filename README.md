@@ -103,6 +103,20 @@ vector<filesystem::path> rglob(vector<string> pathnames);
 
 ## Examples
 
+The following examples use the [standalone](standalone/source/main.cpp) sample that is part of this repository to illustrate the library functionality.
+
+```console
+foo@bar:~$ ./build/standalone/glob -h
+Run glob to find all the pathnames matching a specified pattern
+Usage:
+  ./build/standalone/glob [OPTION...]
+
+  -h, --help       Show help
+  -v, --version    Print the current version number
+  -r, --recursive  Run glob recursively
+  -i, --input arg  Patterns to match
+```
+
 ### Match file extensions
 
 ```console
