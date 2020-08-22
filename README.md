@@ -20,6 +20,7 @@
   * [Exclude files from the matching](#exclude-files-from-the-matching)
   * [Wildcards: Match any one character with question mark ('?')](#wildcards-match-any-one-character-with-question-mark-)
   * [Case sensitivity](#case-sensitivity)
+  * [Tilde expansion](#tilde-expansion)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -258,6 +259,19 @@ foo@bar:~$ ./glob -i "test_files_05/*.png","test_files_05/*.PNG"
 "test_files_05/file1.png"
 "test_files_05/file3.PNG"
 "test_files_05/file4.PNG"
+```
+
+### Tilde expansion
+
+```console
+foo@bar:~$ ./glob -i "~/.b*"
+"/Users/pranav/.bashrc"
+"/Users/pranav/.bash_sessions"
+"/Users/pranav/.bash_profile"
+"/Users/pranav/.bash_history"
+
+foo@bar:~$ ./glob -i "~/Documents/Projects/glob/**/glob/*.h"
+"/Users/pranav/Documents/Projects/glob/include/glob/glob.h"
 ```
 
 ## Contributing
