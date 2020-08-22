@@ -4,22 +4,26 @@
 #if __has_include(<filesystem>)
 #define GHC_USE_STD_FS
 #include <filesystem>
+namespace glob {
 namespace fs {
 using namespace std::filesystem;
 using ifstream = std::ifstream;
 using ofstream = std::ofstream;
 using fstream = std::fstream;
 }
+}
 #endif
 #endif
 #ifndef GHC_USE_STD_FS
 #include <glob/filesystem/fs_fwd.hpp>
+namespace glob {
 namespace fs {
 using namespace ghc::filesystem;
 using ifstream = ghc::filesystem::ifstream;
 using ofstream = ghc::filesystem::ofstream;
 using fstream = ghc::filesystem::fstream;
 } 
+}
 #endif
 
 #include <cassert>
