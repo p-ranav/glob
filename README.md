@@ -29,6 +29,8 @@
   - If you can't use `C++17`, you can integrate [gulrak/filesystem](https://github.com/gulrak/filesystem) with minimal effort.
 * MIT License
 
+### Build Library and Standalone Sample
+
 ```bash
 cmake -Hall -Bbuild
 cmake --build build
