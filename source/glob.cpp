@@ -130,12 +130,6 @@ bool fnmatch_case(const fs::path &name, const std::string &pattern) {
   return std::regex_match(name.string(), compile_pattern(pattern));
 }
 
-bool fnmatch(const fs::path &name, const std::string &pattern) {
-  auto name_normal = name.lexically_normal();
-  auto pattern_normal = fs::path(pattern).lexically_normal();
-  return fnmatch_case(name_normal, pattern_normal.string());
-}
-
 std::vector<fs::path> filter(const std::vector<fs::path> &names,
                              const std::string &pattern) {
   // std::cout << "Pattern: " << pattern << "\n";
