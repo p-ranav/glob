@@ -1,7 +1,7 @@
 
 #include <cassert>
 #include <functional>
-#include <glob/glob.hpp>
+#include <glob/glob.h>
 #include <iostream>
 #include <map>
 #include <regex>

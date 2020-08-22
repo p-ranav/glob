@@ -23,7 +23,7 @@
 
 ## Quick Start
 
-* This library has 2 files: `glob.hpp` and `glob.cpp`
+* This library has 2 files: `glob.h` and `glob.cpp`
   - No external dependencies - just the standard library
   - Requires C++17 `std::filesystem`
   - If you can't use `C++17`, you can integrate [gulrak/filesystem](https://github.com/gulrak/filesystem) with minimal effort.
@@ -84,7 +84,7 @@ Below is a short program that runs `glob` and prints matching path names.
 ***NOTE*** Replace `glob` with `rglob` if you want to glob recursively.
 
 ```cpp
-#include <glob/glob.hpp>
+#include <glob/glob.h>
 #include <iostream>
 
 int main(int argc, char *argv[]) {

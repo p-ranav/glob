@@ -1,4 +1,4 @@
-#include <glob/glob.hpp>
+#include <glob/glob.h>
 #include <iostream>
 
 int main(int argc, char *argv[]) {
