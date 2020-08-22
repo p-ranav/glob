@@ -34,20 +34,31 @@ int main(int argc, char *argv[]) {
 
 ## API
 
-```cpp
-/// \param pathname string containing a path specification
-/// \return vector of paths that match the pathname
-///
-/// Pathnames can be absolute (/usr/src/Foo/Makefile) or relative (../../Tools/*/*.gif)
-/// Pathnames can contain shell-style wildcards
-/// Broken symlinks are included in the results (as in the shell)
-std::vector<std::filesystem::path> glob(const std::string &pathname);
+* No tilde expansion is done but `*`, `?`, and character ranges expressed with `[]` will be correctly matched.
+* For a literal match, wrap the meta-characters in brackets. For example, `[?]` matches the character `?`.
+* With `rglob`, the pattern “**” will match any files and zero or more directories, subdirectories and symbolic links to directories.
 
-/// \param pathname string containing a path specification
-/// \return vector of paths that match the pathname
-///
-/// Globs recursively.
-/// The pattern “**” will match any files and zero or more directories, subdirectories and
-/// symbolic links to directories.
-std::vector<std::filesystem::path> rglob(const std::string &pathname);
+```cpp
+/// e.g., glob("*.hpp")
+/// e.g., glob("**/*.cpp")
+/// e.g., glob("test_files_02/[0-9].txt")
+/// e.g., glob("/usr/local/include/nc*.h")
+/// e.g., glob("test_files_02/?.txt")
+vector<filesystem::path> glob(string pathname);
+
+/// Globs recursively
+/// e.g., rglob("Documents/Projects/Foo/**/*.hpp")
+/// e.g., rglob("test_files_02/*[0-9].txt")
+vector<filesystem::path> rglob(string pathname);
+```
+
+There are also two convenience functions to `glob` on a list of patterns:
+
+```cpp
+/// e.g., glob({"*.png", "*.jpg"})
+vector<filesystem::path> glob(vector<string> pathnames);
+
+/// Globs recursively
+/// e.g., rglob({"*.png", "*.jpg", "*.tiff"})
+vector<filesystem::path> rglob(vector<string> pathnames);
 ```
