@@ -22,20 +22,16 @@ std::vector<std::filesystem::path> glob(const std::string &pathname);
 /// symbolic links to directories.
 std::vector<std::filesystem::path> rglob(const std::string &pathname);
 
-/// \param pathname a vector of strings containing path specifications
-/// \return vector of paths that match the pathname
-///
-/// Pathnames can be absolute (/usr/src/Foo/Makefile) or relative (../../Tools/*/*.gif)
-/// Pathnames can contain shell-style wildcards
-/// Broken symlinks are included in the results (as in the shell)
+/// Runs `glob` against each pathname in `pathnames` and accumulates the results
 std::vector<std::filesystem::path> glob(const std::vector<std::string> &pathnames);
 
-/// \param pathnames a vector of strings containing path specifications
-/// \return vector of paths that match the pathname
-///
-/// Globs recursively.
-/// The pattern “**” will match any files and zero or more directories, subdirectories and
-/// symbolic links to directories.
+/// Runs `rglob` against each pathname in `pathnames` and accumulates the results
 std::vector<std::filesystem::path> rglob(const std::vector<std::string> &pathnames);
+
+/// Initializer list overload for convenience
+std::vector<std::filesystem::path> glob(const std::initializer_list<std::string> &pathnames);
+
+/// Initializer list overload for convenience
+std::vector<std::filesystem::path> rglob(const std::initializer_list<std::string> &pathnames);
 
 } // namespace glob
