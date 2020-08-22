@@ -19,7 +19,7 @@
   * [Wildcards: Match any one character with question mark ('?')](#wildcards-match-any-one-character-with-question-mark-)
   * [Case sensitivity](#case-sensitivity)
 - [Contributing](#contributing)
-- [License)(#license)
+- [License](#license)
 
 ## Quick Start
 
