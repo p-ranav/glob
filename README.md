@@ -18,6 +18,8 @@
   * [Exclude files from the matching](#exclude-files-from-the-matching)
   * [Wildcards: Match any one character with question mark ('?')](#wildcards-match-any-one-character-with-question-mark-)
   * [Case sensitivity](#case-sensitivity)
+- [Contributing](#contributing)
+- [License)(#license)
 
 ## Quick Start
 
@@ -238,3 +240,9 @@ foo@bar:~$ ./main 'test_files_05/*.PNG'
 "test_files_05/file3.PNG"
 "test_files_05/file4.PNG"
 ```
+
+## Contributing
+Contributions are welcome, have a look at the [CONTRIBUTING.md](CONTRIBUTING.md) document for more information.
+
+## License
+The project is available under the [MIT](https://opensource.org/licenses/MIT) license.
