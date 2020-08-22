@@ -212,11 +212,11 @@ foo@bar:~$ ./glob -i 'test_files_03/????[3-4].txt'
 foo@bar:~$ ls test_files_05
 file1.png file2.png file3.PNG file4.PNG
 
-foo@bar:~$ ./main -i 'test_files_05/*.png'
+foo@bar:~$ ./glob -i 'test_files_05/*.png'
 "test_files_05/file2.png"
 "test_files_05/file1.png"
 
-foo@bar:~$ ./main -i 'test_files_05/*.PNG'
+foo@bar:~$ ./glob -i 'test_files_05/*.PNG'
 "test_files_05/file3.PNG"
 "test_files_05/file4.PNG"
 
