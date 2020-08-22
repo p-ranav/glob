@@ -345,11 +345,13 @@ std::vector<std::filesystem::path> rglob(const std::vector<std::string> &pathnam
   return result;
 }
 
-std::vector<std::filesystem::path> glob(const std::initializer_list<std::string> &pathnames) {
+std::vector<std::filesystem::path>
+glob(const std::initializer_list<std::string> &pathnames) {
   return glob(std::vector<std::string>(pathnames));
 }
 
-std::vector<std::filesystem::path> rglob(const std::initializer_list<std::string> &pathnames) {
+std::vector<std::filesystem::path>
+rglob(const std::initializer_list<std::string> &pathnames) {
   return rglob(std::vector<std::string>(pathnames));
 }
 
