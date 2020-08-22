@@ -89,7 +89,6 @@ std::string translate(const std::string &pattern) {
                            std::regex(std::string{R"([&~|])"}), // pattern
                            std::string{R"(\\\1)"});             // repl
         stuff = result;
-
         i = j + 1;
         if (stuff[0] == '!') {
           stuff = "^" + std::string(stuff.begin() + 1, stuff.end());
@@ -129,9 +128,11 @@ std::regex compile_pattern(const std::string &pattern) {
 
 std::vector<fs::path> filter(const std::vector<fs::path> &names,
                              const std::string &pattern) {
+  // std::cout << "Pattern: " << pattern << "\n";
   std::vector<fs::path> result;
   auto regex = details::compile_pattern(pattern);
   for (auto &name : names) {
+    // std::cout << "Checking for " << name.string() << "\n";
     if (std::regex_match(name.string(), regex)) {
       result.push_back(name);
     }
@@ -167,12 +168,15 @@ std::vector<fs::path> iter_directory(const fs::path &dirname, bool dironly) {
   }
 
   if (fs::exists(current_directory)) {
-    for (auto &entry :
-         fs::directory_iterator(fs::absolute(current_directory),
-                                fs::directory_options::follow_directory_symlink |
+    for (auto &entry : fs::directory_iterator(
+             current_directory, fs::directory_options::follow_directory_symlink |
                                     fs::directory_options::skip_permission_denied)) {
       if (!dironly || entry.is_directory()) {
-        result.push_back(entry.path());
+        if (dirname.is_absolute()) {
+          result.push_back(entry.path());
+        } else {
+          result.push_back(fs::relative(entry.path()));
+        }
       }
     }
   }
@@ -215,6 +219,7 @@ std::vector<fs::path> rlistdir(const fs::path &dirname, bool dironly) {
 // directory.
 std::vector<fs::path> glob2(const fs::path &dirname, const std::string &pattern,
                             bool dironly) {
+  // std::cout << "In glob2\n";
   std::vector<fs::path> result;
   assert(is_recursive(pattern));
   for (auto &dir : rlistdir(dirname, dironly)) {
@@ -229,11 +234,19 @@ std::vector<fs::path> glob2(const fs::path &dirname, const std::string &pattern,
 
 std::vector<fs::path> glob1(const fs::path &dirname, const std::string &pattern,
                             bool dironly) {
+  // std::cout << "In glob1\n";
   auto names = iter_directory(dirname, dironly);
   std::vector<fs::path> filtered_names;
   for (auto &n : names) {
     if (!is_hidden(n.string())) {
-      filtered_names.push_back(fs::relative(n));
+      filtered_names.push_back(n.filename());
+      // if (n.is_relative()) {
+      //   // std::cout << "Filtered (Relative): " << n << "\n";
+      //   filtered_names.push_back(fs::relative(n));
+      // } else {
+      //   // std::cout << "Filtered (Absolute): " << n << "\n";
+      //   filtered_names.push_back(n.filename());
+      // }
     }
   }
   return filter(filtered_names, pattern);
@@ -241,6 +254,7 @@ std::vector<fs::path> glob1(const fs::path &dirname, const std::string &pattern,
 
 std::vector<fs::path> glob0(const fs::path &dirname, const fs::path &basename,
                             bool /*dironly*/) {
+  // std::cout << "In glob0\n";
   std::vector<fs::path> result;
   if (basename.empty()) {
     // 'q*x/' should match only directories.
