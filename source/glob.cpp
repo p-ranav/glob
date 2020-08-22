@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 
 namespace glob {
 
-namespace details {
+namespace {
 
 bool string_replace(std::string &str, const std::string &from, const std::string &to) {
   std::size_t start_pos = str.find(from);
@@ -127,7 +127,7 @@ std::regex compile_pattern(const std::string &pattern) {
 }
 
 bool fnmatch_case(const fs::path &name, const std::string &pattern) {
-  return std::regex_match(name.string(), details::compile_pattern(pattern));
+  return std::regex_match(name.string(), compile_pattern(pattern));
 }
 
 bool fnmatch(const fs::path &name, const std::string &pattern) {
@@ -313,7 +313,7 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
 
   std::vector<fs::path> dirs;
   if (dirname != fs::path(pathname) && has_magic(dirname.string())) {
-    dirs = details::glob(dirname, recursive, true);
+    dirs = glob(dirname, recursive, true);
   } else {
     dirs = {dirname};
   }
@@ -322,12 +322,12 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
       glob_in_dir;
   if (has_magic(basename.string())) {
     if (recursive && is_recursive(basename.string())) {
-      glob_in_dir = details::glob2;
+      glob_in_dir = glob2;
     } else {
-      glob_in_dir = details::glob1;
+      glob_in_dir = glob1;
     }
   } else {
-    glob_in_dir = details::glob0;
+    glob_in_dir = glob0;
   }
 
   for (auto &d : dirs) {
@@ -343,20 +343,20 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
   return result;
 }
 
-} // namespace details
+} // namespace end
 
 std::vector<fs::path> glob(const std::string &pathname) {
-  return details::glob(pathname, false);
+  return glob(pathname, false);
 }
 
 std::vector<fs::path> rglob(const std::string &pathname) {
-  return details::glob(pathname, true);
+  return glob(pathname, true);
 }
 
 std::vector<std::filesystem::path> glob(const std::vector<std::string> &pathnames) {
   std::vector<std::filesystem::path> result;
   for (auto &pathname : pathnames) {
-    for (auto &match : details::glob(pathname, false)) {
+    for (auto &match : glob(pathname, false)) {
       result.push_back(std::move(match));
     }
   }
@@ -366,7 +366,7 @@ std::vector<std::filesystem::path> glob(const std::vector<std::string> &pathname
 std::vector<std::filesystem::path> rglob(const std::vector<std::string> &pathnames) {
   std::vector<std::filesystem::path> result;
   for (auto &pathname : pathnames) {
-    for (auto &match : details::glob(pathname, true)) {
+    for (auto &match : glob(pathname, true)) {
       result.push_back(std::move(match));
     }
   }
