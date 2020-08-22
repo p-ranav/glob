@@ -61,3 +61,99 @@ vector<filesystem::path> rglob(vector<string> pathnames);
 | `[]` | any character listed in the brackets | `[ABC]*` matches files starting with A,B or C | 
 | `[-]` | any character in the range listed in brackets | `[A-Z]*` matches files starting with capital letters |
 | `[!]` | any character listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
+
+## Example
+
+Below is a short program that runs `glob` on input patterns and prints the matches.
+
+***NOTE*** Replace `glob` with `rglob` if you want to glob recursively.
+
+```cpp
+#include <glob/glob.hpp>
+#include <iostream>
+
+int main(int argc, char *argv[]) {
+  if (argc < 2) {
+    std::cerr << "Usage: ./exe <pattern...>\n";
+    return EXIT_FAILURE;
+  }
+
+  std::vector<std::string> patterns;
+  for (int i = 1; i < argc; i++) {
+    patterns.push_back(argv[i]);
+  }
+
+  for (auto &f : glob::glob(patterns)) {
+    std::cout << f << "\n";
+  }
+}
+```
+
+### Match header files
+
+```bash
+▶ tree
+.
+├── include
+│   └── foo
+│       ├── bar.hpp
+│       ├── baz.hpp
+│       └── foo.hpp
+└── test
+    ├── bar.cpp
+    ├── doctest.hpp
+    ├── foo.cpp
+    └── main.cpp
+
+3 directories, 7 files
+
+▶ ./main "**/*.hpp"
+"test/doctest.hpp"
+
+▶ ./main "**/**/*.hpp"
+"include/foo/baz.hpp"
+"include/foo/foo.hpp"
+"include/foo/bar.hpp"
+```
+
+***NOTE*** If you use `rglob` instead of `glob`:
+
+```bash
+▶ ./main "**/*.hpp"
+"test/doctest.hpp"
+"include/foo/baz.hpp"
+"include/foo/foo.hpp"
+"include/foo/bar.hpp"
+```
+
+### Absolute Paths - Get files matching a naming scheme
+
+```bash
+▶ ./main '/usr/local/include/nc*.h'
+"/usr/local/include/ncCheck.h"
+"/usr/local/include/ncGroupAtt.h"
+"/usr/local/include/ncUshort.h"
+"/usr/local/include/ncByte.h"
+"/usr/local/include/ncString.h"
+"/usr/local/include/ncUint64.h"
+"/usr/local/include/ncGroup.h"
+"/usr/local/include/ncUbyte.h"
+"/usr/local/include/ncvalues.h"
+"/usr/local/include/ncInt.h"
+"/usr/local/include/ncAtt.h"
+"/usr/local/include/ncVar.h"
+"/usr/local/include/ncUint.h"
+...
+...
+...
+```
+
+### Exclude files starting with pattern:
+
+```bash
+▶ ls test_files_02
+__init__.py foo.py
+
+▶ ./main 'test_files_02/[!_]*.py'
+"test_files_02/foo.py"
+```
