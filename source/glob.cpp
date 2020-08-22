@@ -149,6 +149,23 @@ std::vector<fs::path> filter(const std::vector<fs::path> &names,
   return result;
 }
 
+fs::path expand_tilde(fs::path path) {
+  if (path.empty()) return path;
+
+  const char * home = std::getenv("HOME");
+  if (home == nullptr) {
+    throw std::invalid_argument("error: Unable to expand `~` - HOME environment variable not set.");
+  }
+
+  std::string s = path.string();
+  if (s[0] == '~') {
+    s = std::string(home) + s.substr(1, s.size() - 1);
+    return fs::path(s);
+  } else {
+    return path;
+  }
+}
+
 bool has_magic(const std::string &pathname) {
   static const auto magic_check = std::regex("([*?[])");
   return std::regex_search(pathname, magic_check);
@@ -256,7 +273,13 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
                            bool dironly = false) {
   std::vector<fs::path> result;
 
-  const auto path = fs::path(pathname);
+  auto path = fs::path(pathname);
+
+  if (pathname[0] == '~') {
+    // expand tilde
+    path = expand_tilde(path);
+  }
+
   auto dirname = path.parent_path();
   const auto basename = path.filename();
 
@@ -304,11 +327,11 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
 
   for (auto &d : dirs) {
     for (auto &name : glob_in_dir(d, basename, dironly)) {
+      fs::path subresult = name;
       if (name.parent_path().empty()) {
-        result.push_back(d / name);
-      } else {
-        result.push_back(name);
+        subresult = d / name;
       }
+      result.push_back(subresult);
     }
   }
 
