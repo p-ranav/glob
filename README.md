@@ -169,6 +169,17 @@ foo@bar:~$ ./main 'test_files_02/[1-2]*'
 "test_files_02/1.txt"
 ```
 
+```console
+foo@bar:~$ ls test_files_03
+file1.txt file2.txt file3.txt file4.txt
+
+foo@bar:~$ ./main 'test_files_03/file[0-9].*'
+"test_files_03/file2.txt"
+"test_files_03/file3.txt"
+"test_files_03/file1.txt"
+"test_files_03/file4.txt"
+```
+
 ### Exclude files from the matching
 
 ```console
