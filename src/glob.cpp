@@ -23,13 +23,13 @@ std::vector<fs::path> iter_directory(const fs::path& dirname, bool dironly) {
   std::vector<fs::path> result;  
 
   auto current_directory = dirname;
-  if (dirname.empty()) {
+  if (current_directory.empty()) {
     current_directory = fs::current_path();
   }
 
   for (auto& entry : fs::directory_iterator(current_directory)) {
     if (!dironly || entry.is_directory()) {
-      result.push_back(entry);
+      result.push_back(entry.path());
     }
   }
 
@@ -59,11 +59,7 @@ std::vector<fs::path> rlistdir(const fs::path& dirname, bool dironly) {
   for (auto& x : names) {
     if (!is_hidden(x.string())) {
       result.push_back(x);
-      fs::path path = x;
-      if (!dirname.empty()) {
-        path = dirname / x;
-      }
-      for (auto& y : rlistdir(path, dironly)) {
+      for (auto& y : rlistdir(x, dironly)) {
         result.push_back(y);
       }
     }
@@ -120,9 +116,9 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false, 
   auto dirname = path.parent_path();
   const auto basename = path.filename();
 
-  if (dirname.empty()) {
-    dirname = fs::current_path();
-  }
+  // if (dirname.empty()) {
+  //   dirname = fs::current_path();
+  // }
 
   if (!has_magic(pathname)) {
     assert(!dironly);
