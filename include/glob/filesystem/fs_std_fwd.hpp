@@ -48,7 +48,7 @@ using fstream = std::fstream;
 #ifndef GHC_USE_STD_FS
 #define GHC_WIN_WSTRING_STRING_TYPE
 #define GHC_FILESYSTEM_FWD
-#include <ghc/filesystem.hpp>
+#include <glob/filesystem/filesystem.hpp>
 namespace fs {
 using namespace ghc::filesystem;
 using ifstream = ghc::filesystem::ifstream;

@@ -39,5 +39,5 @@
 #ifndef GHC_USE_STD_FS
 #define GHC_WIN_WSTRING_STRING_TYPE
 #define GHC_FILESYSTEM_IMPLEMENTATION
-#include <ghc/filesystem.hpp>
+#include <glob/filesystem/filesystem.hpp>
 #endif

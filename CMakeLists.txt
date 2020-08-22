@@ -1,0 +1,47 @@
+cmake_minimum_required(VERSION 3.6)
+project(GLOB)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Disable deprecation for windows
+if (WIN32)
+  add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+endif()
+
+option(GLOB_BUILD_SHARED_LIBS "Build shared library" ON)
+option(GLOB_BUILD_STATIC_LIBS "Build static library" ON)
+
+FILE(GLOB GLOB_SOURCES "src/fnmatch.cpp" "src/glob.cpp")
+INCLUDE_DIRECTORIES("include")
+
+if(GLOB_BUILD_SHARED_LIBS)
+  ADD_LIBRARY(GLOB SHARED ${GLOB_SOURCES})
+  SET_TARGET_PROPERTIES(GLOB PROPERTIES OUTPUT_NAME glob)
+  TARGET_LINK_LIBRARIES(GLOB)
+  SET_PROPERTY(TARGET GLOB PROPERTY CXX_STANDARD 11)
+endif()
+
+if(GLOB_BUILD_STATIC_LIBS)
+  ADD_LIBRARY(GLOB_STATIC STATIC ${GLOB_SOURCES})
+  SET_TARGET_PROPERTIES(GLOB_STATIC PROPERTIES OUTPUT_NAME glob_static)
+  TARGET_LINK_LIBRARIES(GLOB_STATIC)
+  SET_PROPERTY(TARGET GLOB_STATIC PROPERTY CXX_STANDARD 11)
+endif()
+
+# Tests
+file(GLOB GLOB_TEST_SOURCES  
+  "tests/main.cpp" 
+  "tests/test_fnmatch.cpp"
+)
+ADD_EXECUTABLE(GLOB_TESTS ${GLOB_TEST_SOURCES})
+INCLUDE_DIRECTORIES("tests")
+set_target_properties(GLOB_TESTS PROPERTIES OUTPUT_NAME tests)
+TARGET_LINK_LIBRARIES(GLOB_TESTS GLOB)
+set_property(TARGET GLOB_TESTS PROPERTY CXX_STANDARD 11)
+
+# make check - runs unit tests
+if (UNIX)
+  add_custom_target(check COMMAND ./tests)
+endif(UNIX)
