@@ -10,6 +10,7 @@
 
 - [Quick Start](#quick-start)
   * [Build Library and Standalone Sample](#build-library-and-standalone-sample)
+- [Usage](#usage)
 - [API](#api)
 - [Wildcards](#wildcards)
 - [Examples](#examples)
@@ -38,6 +39,25 @@ cmake --build build
 
 # run standalone `glob` sample
 ./build/standalone/glob --help
+```
+
+### Usage
+
+```cpp
+// Match on a single pattern
+for (auto& p : glob::glob("*.png")) {
+  // do something with `p`
+}
+
+// Match on multiple patterns
+for (auto& p : glob::glob({"*.png", "*.jpg"})) {
+  // do something with `p`
+}
+
+// Match recursively
+for (auto& p : glob::rglob("**/*.hpp")) {
+  // do something with `p`
+}
 ```
 
 ## API
