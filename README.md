@@ -86,8 +86,8 @@ int main(int argc, char *argv[]) {
 
 ### Match header files
 
-```bash
-▶ tree
+```console
+foo@bar:~$ tree
 .
 ├── include
 │   └── foo
@@ -102,10 +102,10 @@ int main(int argc, char *argv[]) {
 
 3 directories, 7 files
 
-▶ ./main "**/*.hpp"
+foo@bar:~$ ./main "**/*.hpp"
 "test/doctest.hpp"
 
-▶ ./main "**/**/*.hpp"
+foo@bar:~$ ./main "**/**/*.hpp"
 "include/foo/baz.hpp"
 "include/foo/foo.hpp"
 "include/foo/bar.hpp"
@@ -113,18 +113,18 @@ int main(int argc, char *argv[]) {
 
 ***NOTE*** If you use `rglob` instead of `glob`:
 
-```bash
-▶ ./main "**/*.hpp"
+```console
+foo@bar:~$ ./main "**/*.hpp"
 "test/doctest.hpp"
 "include/foo/baz.hpp"
 "include/foo/foo.hpp"
 "include/foo/bar.hpp"
 ```
 
-### Absolute Paths - Get files matching a naming scheme
+### Absolute Paths
 
-```bash
-▶ ./main '/usr/local/include/nc*.h'
+```console
+foo@bar:~$ ./main '/usr/local/include/nc*.h'
 "/usr/local/include/ncCheck.h"
 "/usr/local/include/ncGroupAtt.h"
 "/usr/local/include/ncUshort.h"
@@ -138,17 +138,14 @@ int main(int argc, char *argv[]) {
 "/usr/local/include/ncAtt.h"
 "/usr/local/include/ncVar.h"
 "/usr/local/include/ncUint.h"
-...
-...
-...
 ```
 
-### Exclude files starting with pattern:
+### Exclude files
 
-```bash
-▶ ls test_files_02
+```console
+foo@bar:~$ ls test_files_02
 __init__.py foo.py
 
-▶ ./main 'test_files_02/[!_]*.py'
+foo@bar:~$ ./main 'test_files_02/[!_]*.py'
 "test_files_02/foo.py"
 ```
