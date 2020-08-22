@@ -1,9 +1,13 @@
 
 #pragma once
-#include <glob/fnmatch.hpp>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 namespace glob {
 
-std::vector<fs::path> glob(const std::string &pathname, bool recursive = false);
+std::vector<std::filesystem::path> glob(const std::string &pathname);
 
-}
+std::vector<std::filesystem::path> rglob(const std::string &pathname);
+
+} // namespace glob
