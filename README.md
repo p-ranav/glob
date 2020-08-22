@@ -12,11 +12,11 @@
 - [API](#api)
 - [Wildcards](#wildcards)
 - [Example](#example)
-  * [Match header files](#match-header-files)
-  * [Absolute Paths](#absolute-paths)
-  * [Exclude files](#exclude-files)
-  * [Wildcards: Brackets](#wildcards-brackets)
-  * [Wildcards: Question mark](#wildcards-question-mark)
+  * [Match file extensions](#match-file-extensions)
+  * [Match files in absolute pathnames](#match-files-in-absolute-pathnames)
+  * [Wildcards: Match a range of characters listed in brackets ('[]')](#wildcards-match-a-range-of-characters-listed-in-brackets)
+  * [Exclude files from the matching](#exclude-files-from-the-matching)
+  * [Wildcards: Match any one character with question mark ('?')](#wildcards-match-any-one-character-with-question-mark)
 
 ## Quick Start
 
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-### Match header files
+### Match file extensions
 
 ```console
 foo@bar:~$ tree
@@ -133,7 +133,7 @@ foo@bar:~$ ./main "**/*.hpp"
 "include/foo/bar.hpp"
 ```
 
-### Absolute Paths
+### Match files in absolute pathnames
 
 ```console
 foo@bar:~$ ./main '/usr/local/include/nc*.h'
@@ -152,17 +152,7 @@ foo@bar:~$ ./main '/usr/local/include/nc*.h'
 "/usr/local/include/ncUint.h"
 ```
 
-### Exclude files
-
-```console
-foo@bar:~$ ls test_files_02
-__init__.py foo.py
-
-foo@bar:~$ ./main 'test_files_02/[!_]*.py'
-"test_files_02/foo.py"
-```
-
-### Wildcards: Brackets
+### Wildcards: Match a range of characters listed in brackets ('[]')
 
 ```console
 foo@bar:~$ ls test_files_02
@@ -179,7 +169,17 @@ foo@bar:~$ ./main 'test_files_02/[1-2]*'
 "test_files_02/1.txt"
 ```
 
-### Wildcards: Question mark
+### Exclude files from the matching
+
+```console
+foo@bar:~$ ls test_files_02
+__init__.py foo.py
+
+foo@bar:~$ ./main 'test_files_02/[!_]*.py'
+"test_files_02/foo.py"
+```
+
+### Wildcards: Match any one character with question mark ('?')
 
 ```console
 foo@bar:~$ ls test_files_02
