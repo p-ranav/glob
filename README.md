@@ -183,11 +183,19 @@ foo@bar:~$ ./main 'test_files_03/file[0-9].*'
 ### Exclude files from the matching
 
 ```console
-foo@bar:~$ ls test_files_02
-__init__.py foo.py
+foo@bar:~$ ls test_files_01
+__init__.py     bar.py      foo.py
 
-foo@bar:~$ ./main 'test_files_02/[!_]*.py'
-"test_files_02/foo.py"
+foo@bar:~$ ./main 'test_files_01/*[!__init__].py'
+"test_files_01/bar.py"
+"test_files_01/foo.py"
+
+foo@bar:~$ ./main 'test_files_01/*[!__init__][!bar].py'
+"test_files_01/foo.py"
+
+foo@bar:~$ ./main 'test_files_01/[!_]*.py'
+"test_files_01/bar.py"
+"test_files_01/foo.py"
 ```
 
 ### Wildcards: Match any one character with question mark ('?')
