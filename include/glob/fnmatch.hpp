@@ -24,6 +24,7 @@ using fstream = ghc::filesystem::fstream;
 
 #include <cassert>
 #include <iostream>
+#include <map>
 #include <regex>
 #include <string>
 #include <vector>
@@ -105,14 +106,12 @@ std::string translate_to_regex_string(const std::string& pattern) {
           }
 
           // Escape set operations (&&, ~~ and ||).     
-          std::cout << "Before: " << stuff << "\n";
           std::string result;
           std::regex_replace(std::back_inserter(result), // ressult 
             stuff.begin(), stuff.end(),                  // string
-            std::regex(std::string{R"(\\\1)"}),          // pattern
-            std::string{R"(([&~|]))"});                  // repl
+            std::regex(std::string{R"([&~|])"}),          // pattern
+            std::string{R"(\\\1)"});                       // repl
           stuff = result;
-          std::cout << "After: " << stuff << "\n";
 
           i = j + 1;
           if (stuff[0] == '!') {
@@ -125,24 +124,31 @@ std::string translate_to_regex_string(const std::string& pattern) {
         }
       }
       else {
-        // _special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|^$\\.&~# \t\n\r\v\f'}
-        bool special_character = false;
-        for (auto& sc : "[&~|]") {
-          if (c == sc) {
-            result_string += "\\\\" + std::string(1, c);
-            special_character = true;
-            break;
+        // SPECIAL_CHARS
+        // closing ')', '}' and ']'
+        // '-' (a range in character set)
+        // '&', '~', (extended character set operations)
+        // '#' (comment) and WHITESPACE (ignored) in verbose mode
+        static std::string special_characters = "()[]{}?*+-|^$\\.&~# \t\n\r\v\f";
+        static std::map<int, std::string> special_characters_map;
+        if (special_characters_map.empty()) {
+          for (auto& c : special_characters) {
+            special_characters_map.insert(std::make_pair(static_cast<int>(c), std::string{"\\"} + std::string(1, c)));
           }
         }
-        if (!special_character) result_string += c;
+
+        if (special_characters.find(c) != std::string::npos) {
+          result_string += special_characters_map[static_cast<int>(c)];
+        } else {
+          result_string += c;
+        }
       }
   }
-  return std::string{"("} + result_string + std::string{R"())"};
+  return std::string{"(("} + result_string + std::string{R"()|[\r\n])$)"};
 }
 
 std::regex compile_pattern(const std::string& pattern) {
-  auto regex_string = translate_to_regex_string(pattern);
-  return std::regex(regex_string, std::regex::ECMAScript);
+  return std::regex(translate_to_regex_string(pattern), std::regex::ECMAScript);
 }
 
 std::vector<fs::path> filter(const std::vector<fs::path>& names, const std::string& pattern) {
