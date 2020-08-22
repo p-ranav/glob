@@ -1,59 +1,75 @@
-cmake_minimum_required(VERSION 3.6)
-project(GLOB)
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+# ---- Project ----
+
+# Note: update this to your new project's name and version
+project(
+  Glob
+  VERSION 1.0
+  LANGUAGES CXX
+)
+
+# ---- Include guards ----
+
+if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
+  message(
+    FATAL_ERROR
+      "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there."
+  )
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+# ---- Add dependencies via CPM ----
+# see https://github.com/TheLartians/CPM.cmake for more info
 
-# Disable deprecation for windows
-if (WIN32)
-  add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
-endif()
+include(cmake/CPM.cmake)
 
-option(GLOB_BUILD_SHARED_LIBS "Build shared library" ON)
-option(GLOB_BUILD_STATIC_LIBS "Build static library" ON)
-option(GLOB_BUILD_SAMPLES "Build samples" ON)
+# PackageProject.cmake will be used to make our target installable
+CPMAddPackage(
+  NAME PackageProject.cmake
+  GITHUB_REPOSITORY TheLartians/PackageProject.cmake
+  VERSION 1.3
+)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+# ---- Add source files ----
 
-FILE(GLOB GLOB_SOURCES "src/glob.cpp")
-INCLUDE_DIRECTORIES("include")
+# Note: globbing sources is considered bad practice as CMake's generators may not detect new files
+# automatically. Keep that in mind when changing files, or explicitly mention them here.
+file(GLOB_RECURSE headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 
-if(GLOB_BUILD_SHARED_LIBS)
-  ADD_LIBRARY(GLOB SHARED ${GLOB_SOURCES})
-  SET_TARGET_PROPERTIES(GLOB PROPERTIES OUTPUT_NAME glob)
-  TARGET_LINK_LIBRARIES(GLOB)
-  SET_PROPERTY(TARGET GLOB PROPERTY CXX_STANDARD 17)
-endif()
+# ---- Create library ----
 
-if(GLOB_BUILD_STATIC_LIBS)
-  ADD_LIBRARY(GLOB_STATIC STATIC ${GLOB_SOURCES})
-  SET_TARGET_PROPERTIES(GLOB_STATIC PROPERTIES OUTPUT_NAME glob_static)
-  TARGET_LINK_LIBRARIES(GLOB_STATIC)
-  SET_PROPERTY(TARGET GLOB_STATIC PROPERTY CXX_STANDARD 17)
-endif()
+# Note: for header-only libraries change all PUBLIC flags to INTERFACE and create an interface
+# target: add_library(Glob INTERFACE) set_target_properties(Glob PROPERTIES
+# INTERFACE_COMPILE_FEATURES cxx_std_17)
 
-if(GLOB_BUILD_SAMPLES)
-  # GLOB_PRINT_MATCHES sample
-  ADD_EXECUTABLE(GLOB_PRINT_MATCHES "samples/glob_and_print_matches.cpp")
-  SET_TARGET_PROPERTIES(GLOB_PRINT_MATCHES PROPERTIES OUTPUT_NAME glob)
-  TARGET_LINK_LIBRARIES(GLOB_PRINT_MATCHES GLOB)
-  SET_PROPERTY(TARGET GLOB_PRINT_MATCHES PROPERTY CXX_STANDARD 17)
+add_library(Glob ${headers} ${sources})
 
-  # GLOB_PRINT_MATCHES_RECURSIVE sample
-  ADD_EXECUTABLE(GLOB_PRINT_MATCHES_RECURSIVE "samples/rglob_and_print_matches.cpp")
-  SET_TARGET_PROPERTIES(GLOB_PRINT_MATCHES_RECURSIVE PROPERTIES OUTPUT_NAME rglob)
-  TARGET_LINK_LIBRARIES(GLOB_PRINT_MATCHES_RECURSIVE GLOB)
-  SET_PROPERTY(TARGET GLOB_PRINT_MATCHES_RECURSIVE PROPERTY CXX_STANDARD 17)
-endif()
+set_target_properties(Glob PROPERTIES CXX_STANDARD 17)
 
-# make check - runs unit tests
-if (UNIX)
-  add_custom_target(check COMMAND ./tests)
-endif(UNIX)
+# being a cross-platform target, we enforce standards conformance on MSVC
+target_compile_options(Glob PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
+
+# Link dependencies (if required) target_link_libraries(Glob PUBLIC cxxopts)
+
+target_include_directories(
+  Glob PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+                 $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
+)
+
+# ---- Create an installable target ----
+# this allows users to install and find the library via `find_package()`.
+
+# the location where the project's version header will be placed should match the project's regular
+# header paths
+string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
+
+packageProject(
+  NAME ${PROJECT_NAME}
+  VERSION ${PROJECT_VERSION}
+  BINARY_DIR ${PROJECT_BINARY_DIR}
+  INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include
+  INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
+  VERSION_HEADER "${VERSION_HEADER_LOCATION}"
+  DEPENDENCIES ""
+)

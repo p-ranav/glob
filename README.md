@@ -30,10 +30,11 @@
 * MIT License
 
 ```bash
-git clone https://github.com/p-ranav/glob
-cd glob
-mkdir build && cd build
-cmake .. && make
+cmake -Hall -Bbuild
+cmake --build build
+
+# run standalone `glob` sample
+./build/standalone/glob --help
 ```
 
 ## API
