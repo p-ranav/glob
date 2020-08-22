@@ -184,16 +184,21 @@ std::vector<fs::path> iter_directory(const fs::path &dirname, bool dironly) {
   }
 
   if (fs::exists(current_directory)) {
-    for (auto &entry : fs::directory_iterator(
-             current_directory, fs::directory_options::follow_directory_symlink |
-                                    fs::directory_options::skip_permission_denied)) {
-      if (!dironly || entry.is_directory()) {
-        if (dirname.is_absolute()) {
-          result.push_back(entry.path());
-        } else {
-          result.push_back(fs::relative(entry.path()));
+    try {
+      for (auto &entry : fs::directory_iterator(
+              current_directory, fs::directory_options::follow_directory_symlink |
+                                      fs::directory_options::skip_permission_denied)) {
+        if (!dironly || entry.is_directory()) {
+          if (dirname.is_absolute()) {
+            result.push_back(entry.path());
+          } else {
+            result.push_back(fs::relative(entry.path()));
+          }
         }
       }
+    } catch (std::exception& e) {
+      // not a directory
+      // do nothing
     }
   }
 
