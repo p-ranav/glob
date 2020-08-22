@@ -9,6 +9,7 @@
 ## Table of Contents
 
 - [Quick Start](#quick-start)
+  * [Build Library and Standalone Sample](#build-library-and-standalone-sample)
 - [API](#api)
 - [Wildcards](#wildcards)
 - [Examples](#examples)
