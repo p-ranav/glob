@@ -14,7 +14,7 @@
   - If you can't use `C++17`, you can integrate [gulrak/filesystem](https://github.com/gulrak/filesystem) with minimal effort.
 * MIT License
 
-```bash
+```console
 git clone https://github.com/p-ranav/glob
 cd glob
 mkdir build && cd build
@@ -148,4 +148,43 @@ __init__.py foo.py
 
 foo@bar:~$ ./main 'test_files_02/[!_]*.py'
 "test_files_02/foo.py"
+```
+
+### Wildcards: Brackets
+
+```console
+foo@bar:~$ ls test_files_02
+1.txt 2.txt 3.txt 4.txt
+
+foo@bar:~$ ./main 'test_files_02/[0-9].txt'
+"test_files_02/4.txt"
+"test_files_02/3.txt"
+"test_files_02/2.txt"
+"test_files_02/1.txt"
+
+foo@bar:~$ ./main 'test_files_02/[1-2]*'
+"test_files_02/2.txt"
+"test_files_02/1.txt"
+```
+
+### Wildcards: Question mark
+
+```console
+foo@bar:~$ ls test_files_02
+1.txt 2.txt 3.txt 4.txt
+
+foo@bar:~$ ./main 'test_files_02/?.txt'
+"test_files_02/4.txt"
+"test_files_02/3.txt"
+"test_files_02/2.txt"
+"test_files_02/1.txt"
+```
+
+```console
+foo@bar:~$ ls test_files_03
+file1.txt file2.txt file3.txt file4.txt
+
+foo@bar:~$ ./main 'test_files_03/????[3-4].txt'
+"test_files_03/file3.txt"
+"test_files_03/file4.txt"
 ```
