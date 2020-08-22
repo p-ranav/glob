@@ -14,7 +14,7 @@
   - If you can't use `C++17`, you can integrate [gulrak/filesystem](https://github.com/gulrak/filesystem) with minimal effort.
 * MIT License
 
-```console
+```bash
 git clone https://github.com/p-ranav/glob
 cd glob
 mkdir build && cd build
