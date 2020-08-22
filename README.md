@@ -64,7 +64,7 @@ vector<filesystem::path> rglob(vector<string> pathnames);
 
 ## Example
 
-Below is a short program that runs `glob` on input patterns and prints the matches.
+Below is a short program that runs `glob` and prints the matches.
 
 ***NOTE*** Replace `glob` with `rglob` if you want to glob recursively.
 
@@ -73,17 +73,12 @@ Below is a short program that runs `glob` on input patterns and prints the match
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    std::cerr << "Usage: ./exe <pattern...>\n";
+  if (argc != 2) {
+    std::cerr << "Usage: ./exe <pattern>\n";
     return EXIT_FAILURE;
   }
 
-  std::vector<std::string> patterns;
-  for (int i = 1; i < argc; i++) {
-    patterns.push_back(argv[i]);
-  }
-
-  for (auto &f : glob::glob(patterns)) {
+  for (auto &f : glob::glob(argv[1])) {
     std::cout << f << "\n";
   }
 }
