@@ -3,5 +3,5 @@
 </p>
 
 <p align="center">
-  Unix style pathname pattern expansion
+  Unix-style pathname pattern expansion
 </p>
