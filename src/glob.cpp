@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 #include <regex>
+namespace fs = std::filesystem;
 
 namespace glob {
 
@@ -166,7 +167,9 @@ std::vector<fs::path> iter_directory(const fs::path &dirname, bool dironly) {
   }
 
   if (fs::exists(current_directory)) {
-    for (auto &entry : fs::directory_iterator(current_directory)) {
+    for (auto &entry : fs::directory_iterator(fs::absolute(current_directory), 
+      fs::directory_options::follow_directory_symlink | 
+      fs::directory_options::skip_permission_denied)) {
       if (!dironly || entry.is_directory()) {
         result.push_back(entry.path());
       }
@@ -207,6 +210,8 @@ std::vector<fs::path> rlistdir(const fs::path &dirname, bool dironly) {
   return result;
 }
 
+// This helper function recursively yields relative pathnames inside a literal
+// directory.
 std::vector<fs::path> glob2(const fs::path &dirname, const std::string &pattern,
                             bool dironly) {
   std::vector<fs::path> result;
@@ -225,18 +230,16 @@ std::vector<fs::path> glob1(const fs::path &dirname, const std::string &pattern,
                             bool dironly) {
   auto names = iter_directory(dirname, dironly);
   std::vector<fs::path> filtered_names;
-  if (!is_hidden(pattern)) {
-    for (auto &n : names) {
-      if (!is_hidden(n.string())) {
-        filtered_names.push_back(fs::relative(n));
-      }
+  for (auto &n : names) {
+    if (!is_hidden(n.string())) {
+      filtered_names.push_back(fs::relative(n));
     }
   }
   return filter(filtered_names, pattern);
 }
 
 std::vector<fs::path> glob0(const fs::path &dirname, const fs::path &basename,
-                            bool dironly) {
+                            bool /*dironly*/) {
   std::vector<fs::path> result;
   if (basename.empty()) {
     // 'q*x/' should match only directories.
