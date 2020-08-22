@@ -167,9 +167,10 @@ std::vector<fs::path> iter_directory(const fs::path &dirname, bool dironly) {
   }
 
   if (fs::exists(current_directory)) {
-    for (auto &entry : fs::directory_iterator(fs::absolute(current_directory), 
-      fs::directory_options::follow_directory_symlink | 
-      fs::directory_options::skip_permission_denied)) {
+    for (auto &entry :
+         fs::directory_iterator(fs::absolute(current_directory),
+                                fs::directory_options::follow_directory_symlink |
+                                    fs::directory_options::skip_permission_denied)) {
       if (!dironly || entry.is_directory()) {
         result.push_back(entry.path());
       }
@@ -309,7 +310,7 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
       if (name.parent_path().empty()) {
         result.push_back(d / name);
       } else {
-        result.push_back(name);        
+        result.push_back(name);
       }
     }
   }
