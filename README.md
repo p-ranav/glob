@@ -17,6 +17,7 @@
   * [Wildcards: Match a range of characters listed in brackets ('[]')](#wildcards-match-a-range-of-characters-listed-in-brackets-)
   * [Exclude files from the matching](#exclude-files-from-the-matching)
   * [Wildcards: Match any one character with question mark ('?')](#wildcards-match-any-one-character-with-question-mark-)
+  * [Case sensitivity](#case-sensitivity)
 
 ## Quick Start
 
