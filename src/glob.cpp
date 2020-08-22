@@ -342,4 +342,24 @@ std::vector<fs::path> rglob(const std::string &pathname) {
   return details::glob(pathname, true);
 }
 
+std::vector<std::filesystem::path> glob(const std::vector<std::string> &pathnames) {
+  std::vector<std::filesystem::path> result;
+  for (auto &pathname : pathnames) {
+    for (auto &match : details::glob(pathname, false)) {
+      result.push_back(std::move(match));
+    }
+  }
+  return result;
+}
+
+std::vector<std::filesystem::path> rglob(const std::vector<std::string> &pathnames) {
+  std::vector<std::filesystem::path> result;
+  for (auto &pathname : pathnames) {
+    for (auto &match : details::glob(pathname, true)) {
+      result.push_back(std::move(match));
+    }
+  }
+  return result;
+}
+
 } // namespace glob
