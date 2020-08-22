@@ -14,9 +14,9 @@
 - [Example](#example)
   * [Match file extensions](#match-file-extensions)
   * [Match files in absolute pathnames](#match-files-in-absolute-pathnames)
-  * [Wildcards: Match a range of characters listed in brackets ('[]')](#wildcards-match-a-range-of-characters-listed-in-brackets)
+  * [Wildcards: Match a range of characters listed in brackets ('[]')](#wildcards-match-a-range-of-characters-listed-in-brackets-)
   * [Exclude files from the matching](#exclude-files-from-the-matching)
-  * [Wildcards: Match any one character with question mark ('?')](#wildcards-match-any-one-character-with-question-mark)
+  * [Wildcards: Match any one character with question mark ('?')](#wildcards-match-any-one-character-with-question-mark-)
 
 ## Quick Start
 
