@@ -183,22 +183,6 @@ std::vector<fs::path> iter_directory(const fs::path &dirname, bool dironly) {
   return result;
 }
 
-// Escape all special characters.
-std::string escape(const std::string &pathname) {
-  // Escaping is done by wrapping any of "*?[" between square brackets.
-  // Meta-characters do not work in the drive part and shouldn't be escaped.
-
-  // drive, pathname = os.path.splitdrive(pathname)
-  auto path = fs::path(pathname);
-  auto drive = path.root_name();
-  auto relative_path = path.relative_path();
-
-  static const auto magic_check = std::regex("([*?[])");
-  // magic_check.sub(r'[\1]', pathname)
-  relative_path = std::regex_replace(relative_path.string(), magic_check, R"([\1])");
-  return drive / relative_path;
-}
-
 // Recursively yields relative pathnames inside a literal directory.
 std::vector<fs::path> rlistdir(const fs::path &dirname, bool dironly) {
   std::vector<fs::path> result;
