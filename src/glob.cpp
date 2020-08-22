@@ -90,7 +90,7 @@ std::vector<fs::path> glob1(const fs::path& dirname, const std::string& pattern,
   if (!is_hidden(pattern)) {
     for (auto& n : names) {
       if (!is_hidden(n.string())) {
-        filtered_names.push_back(fs::absolute(n));
+        filtered_names.push_back(fs::relative(n));
       }
     }
   }
@@ -117,8 +117,12 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false, 
   std::vector<fs::path> result;
 
   const auto path = fs::path(pathname);
-  const auto dirname = path.parent_path();
+  auto dirname = path.parent_path();
   const auto basename = path.filename();
+
+  if (dirname.empty()) {
+    dirname = fs::current_path();
+  }
 
   if (!has_magic(pathname)) {
     assert(!dironly);

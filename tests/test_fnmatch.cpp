@@ -79,3 +79,24 @@ TEST_CASE("fnmatch_case can filter for all items that match pattern" * test_suit
   REQUIRE(filtered[2].string() == "fnmatch_fnmatchcase.py");
   REQUIRE(filtered[3].string() == "fnmatch_translate.py");
 }
+
+TEST_CASE("fnmatch_case can filter for all items that match pattern" * test_suite("fnmatch")) {
+  const std::string pattern = "test[0-9].py";
+  const std::vector<fs::path> files = {
+    fs::path("__init__.py"),
+    fs::path("test1.py"),
+    fs::path("test2.py"),
+    fs::path("index.rst")
+  };
+
+  const auto filtered = details::filter(files, pattern);
+  REQUIRE(filtered.size() == 2);
+  REQUIRE(filtered[0].string() == "test1.py");
+  REQUIRE(filtered[1].string() == "test2.py");
+}
+
+TEST_CASE("fnmatch_case can check [] patterns" * test_suite("fnmatch")) {
+  REQUIRE(fnmatch_case("test1.py", "test[0-9].py"));
+  REQUIRE(fnmatch_case("test2.py", "test[0-9].py"));
+  REQUIRE_FALSE(fnmatch_case("test17.py", "test[0-9].py"));
+}

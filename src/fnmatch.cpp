@@ -86,9 +86,9 @@ std::string translate_to_regex_string(const std::string& pattern) {
 
           // Escape set operations (&&, ~~ and ||).     
           std::string result;
-          std::regex_replace(std::back_inserter(result), // ressult 
-            stuff.begin(), stuff.end(),                  // string
-            std::regex(std::string{R"([&~|])"}),          // pattern
+          std::regex_replace(std::back_inserter(result),   // ressult 
+            stuff.begin(), stuff.end(),                    // string
+            std::regex(std::string{R"([&~|])"}),           // pattern
             std::string{R"(\\\1)"});                       // repl
           stuff = result;
 
