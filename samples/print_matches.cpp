@@ -1,4 +1,5 @@
 #include <glob/glob.hpp>
+#include <iostream>
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
@@ -6,7 +7,7 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  for (auto& f : glob::glob(argv[1])) {
-    std::cout << fs::relative(f) << "\n";
+  for (auto &f : glob::glob(argv[1])) {
+    std::cout << std::filesystem::relative(f) << "\n";
   }
 }
