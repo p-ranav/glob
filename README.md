@@ -6,6 +6,18 @@
   Unix-style pathname pattern expansion
 </p>
 
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [API](#api)
+- [Wildcards](#wildcards)
+- [Example](#example)
+  * [Match header files](#match-header-files)
+  * [Absolute Paths](#absolute-paths)
+  * [Exclude files](#exclude-files)
+  * [Wildcards: Brackets](#wildcards-brackets)
+  * [Wildcards: Question mark](#wildcards-question-mark)
+
 ## Quick Start
 
 * This library has 2 files: `glob.hpp` and `glob.cpp`
