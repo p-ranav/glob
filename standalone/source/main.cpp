@@ -22,11 +22,16 @@ int main(int argc, char** argv) {
 
   auto result = options.parse(argc, argv);
 
-  if (result["help"].as<bool>() || patterns.empty()) {
+  if (result["help"].as<bool>()) {
     std::cout << options.help() << std::endl;
     return 0;
   } else if (result["version"].as<bool>()) {
-    std::cout << "Glob, version " << GLOB_VERSION << std::endl;
+    std::cout << "glob, version " << GLOB_VERSION << std::endl;
+    return 0;
+  }
+
+  if (patterns.empty()) {
+    std::cout << options.help() << std::endl;
     return 0;
   }
 
