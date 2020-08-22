@@ -76,7 +76,7 @@ vector<filesystem::path> rglob(vector<string> pathnames);
 
 ## Example
 
-Below is a short program that runs `glob` and prints the matches.
+Below is a short program that runs `glob` and prints matching path names.
 
 ***NOTE*** Replace `glob` with `rglob` if you want to glob recursively.
 
@@ -90,6 +90,7 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  // Run glob on the vector of patterns
   for (auto &f : glob::glob(argv[1])) {
     std::cout << f << "\n";
   }
@@ -218,4 +219,21 @@ file1.txt file2.txt file3.txt file4.txt
 foo@bar:~$ ./main 'test_files_03/????[3-4].txt'
 "test_files_03/file3.txt"
 "test_files_03/file4.txt"
+```
+
+### Case sensitivity
+
+`glob` matching is case-sensitive:
+
+```console
+foo@bar:~$ ls test_files_05
+file1.png file2.png file3.PNG file4.PNG
+
+foo@bar:~$ ./main 'test_files_05/*.png'
+"test_files_05/file2.png"
+"test_files_05/file1.png"
+
+foo@bar:~$ ./main 'test_files_05/*.PNG'
+"test_files_05/file3.PNG"
+"test_files_05/file4.PNG"
 ```
