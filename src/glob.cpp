@@ -11,7 +11,7 @@ namespace glob {
 namespace details {
 
 bool string_replace(std::string &str, const std::string &from, const std::string &to) {
-  size_t start_pos = str.find(from);
+  std::size_t start_pos = str.find(from);
   if (start_pos == std::string::npos)
     return false;
   str.replace(start_pos, from.length(), to);
@@ -165,9 +165,11 @@ std::vector<fs::path> iter_directory(const fs::path &dirname, bool dironly) {
     current_directory = fs::current_path();
   }
 
-  for (auto &entry : fs::directory_iterator(current_directory)) {
-    if (!dironly || entry.is_directory()) {
-      result.push_back(entry.path());
+  if (fs::exists(current_directory)) {
+    for (auto &entry : fs::directory_iterator(current_directory)) {
+      if (!dironly || entry.is_directory()) {
+        result.push_back(entry.path());
+      }
     }
   }
 
@@ -257,10 +259,6 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
   auto dirname = path.parent_path();
   const auto basename = path.filename();
 
-  // if (dirname.empty()) {
-  //   dirname = fs::current_path();
-  // }
-
   if (!has_magic(pathname)) {
     assert(!dironly);
     if (!basename.empty()) {
@@ -305,7 +303,11 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
 
   for (auto &d : dirs) {
     for (auto &name : glob_in_dir(d, basename, dironly)) {
-      result.push_back(fs::absolute(name));
+      if (name.parent_path().empty()) {
+        result.push_back(d / name);
+      } else {
+        result.push_back(name);        
+      }
     }
   }
 
