@@ -8,6 +8,6 @@ int main(int argc, char *argv[]) {
   }
 
   for (auto &f : glob::rglob(argv[1])) {
-    std::cout << std::filesystem::relative(f) << "\n";
+    std::cout << fs::relative(f) << "\n";
   }
 }

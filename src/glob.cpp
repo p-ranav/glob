@@ -126,9 +126,9 @@ std::regex compile_pattern(const std::string &pattern) {
   return std::regex(translate(pattern), std::regex::ECMAScript);
 }
 
-std::vector<std::filesystem::path> filter(const std::vector<std::filesystem::path> &names,
-                                          const std::string &pattern) {
-  std::vector<std::filesystem::path> result;
+std::vector<fs::path> filter(const std::vector<fs::path> &names,
+                             const std::string &pattern) {
+  std::vector<fs::path> result;
   auto regex = details::compile_pattern(pattern);
   for (auto &name : names) {
     if (std::regex_match(name.string(), regex)) {
@@ -138,13 +138,13 @@ std::vector<std::filesystem::path> filter(const std::vector<std::filesystem::pat
   return result;
 }
 
-bool fnmatch_case(const std::filesystem::path &name, const std::string &pattern) {
+bool fnmatch_case(const fs::path &name, const std::string &pattern) {
   return std::regex_match(name.string(), details::compile_pattern(pattern));
 }
 
-bool fnmatch(const std::filesystem::path &name, const std::string &pattern) {
+bool fnmatch(const fs::path &name, const std::string &pattern) {
   auto name_normal = name.lexically_normal();
-  auto pattern_normal = std::filesystem::path(pattern).lexically_normal();
+  auto pattern_normal = fs::path(pattern).lexically_normal();
   return fnmatch_case(name_normal, pattern_normal.string());
 }
 
@@ -157,16 +157,15 @@ bool is_hidden(const std::string &pathname) { return pathname[0] == '.'; }
 
 bool is_recursive(const std::string &pattern) { return pattern == "**"; }
 
-std::vector<std::filesystem::path> iter_directory(const std::filesystem::path &dirname,
-                                                  bool dironly) {
-  std::vector<std::filesystem::path> result;
+std::vector<fs::path> iter_directory(const fs::path &dirname, bool dironly) {
+  std::vector<fs::path> result;
 
   auto current_directory = dirname;
   if (current_directory.empty()) {
-    current_directory = std::filesystem::current_path();
+    current_directory = fs::current_path();
   }
 
-  for (auto &entry : std::filesystem::directory_iterator(current_directory)) {
+  for (auto &entry : fs::directory_iterator(current_directory)) {
     if (!dironly || entry.is_directory()) {
       result.push_back(entry.path());
     }
@@ -181,7 +180,7 @@ std::string escape(const std::string &pathname) {
   // Meta-characters do not work in the drive part and shouldn't be escaped.
 
   // drive, pathname = os.path.splitdrive(pathname)
-  auto path = std::filesystem::path(pathname);
+  auto path = fs::path(pathname);
   auto drive = path.root_name();
   auto relative_path = path.relative_path();
 
@@ -192,9 +191,8 @@ std::string escape(const std::string &pathname) {
 }
 
 // Recursively yields relative pathnames inside a literal directory.
-std::vector<std::filesystem::path> rlistdir(const std::filesystem::path &dirname,
-                                            bool dironly) {
-  std::vector<std::filesystem::path> result;
+std::vector<fs::path> rlistdir(const fs::path &dirname, bool dironly) {
+  std::vector<fs::path> result;
   auto names = iter_directory(dirname, dironly);
   for (auto &x : names) {
     if (!is_hidden(x.string())) {
@@ -207,9 +205,9 @@ std::vector<std::filesystem::path> rlistdir(const std::filesystem::path &dirname
   return result;
 }
 
-std::vector<std::filesystem::path> glob2(const std::filesystem::path &dirname,
-                                         const std::string &pattern, bool dironly) {
-  std::vector<std::filesystem::path> result;
+std::vector<fs::path> glob2(const fs::path &dirname, const std::string &pattern,
+                            bool dironly) {
+  std::vector<fs::path> result;
   assert(is_recursive(pattern));
   for (auto &dir : rlistdir(dirname, dironly)) {
     result.push_back(dir);
@@ -221,58 +219,57 @@ std::vector<std::filesystem::path> glob2(const std::filesystem::path &dirname,
 // They return a list of basenames.  _glob1 accepts a pattern while _glob0
 // takes a literal basename (so it only has to check for its existence).
 
-std::vector<std::filesystem::path> glob1(const std::filesystem::path &dirname,
-                                         const std::string &pattern, bool dironly) {
+std::vector<fs::path> glob1(const fs::path &dirname, const std::string &pattern,
+                            bool dironly) {
   auto names = iter_directory(dirname, dironly);
-  std::vector<std::filesystem::path> filtered_names;
+  std::vector<fs::path> filtered_names;
   if (!is_hidden(pattern)) {
     for (auto &n : names) {
       if (!is_hidden(n.string())) {
-        filtered_names.push_back(std::filesystem::relative(n));
+        filtered_names.push_back(fs::relative(n));
       }
     }
   }
   return filter(filtered_names, pattern);
 }
 
-std::vector<std::filesystem::path> glob0(const std::filesystem::path &dirname,
-                                         const std::filesystem::path &basename,
-                                         bool dironly) {
-  std::vector<std::filesystem::path> result;
+std::vector<fs::path> glob0(const fs::path &dirname, const fs::path &basename,
+                            bool dironly) {
+  std::vector<fs::path> result;
   if (basename.empty()) {
     // 'q*x/' should match only directories.
-    if (std::filesystem::is_directory(dirname)) {
+    if (fs::is_directory(dirname)) {
       result = {basename};
     }
   } else {
-    if (std::filesystem::exists(dirname / basename)) {
+    if (fs::exists(dirname / basename)) {
       result = {basename};
     }
   }
   return result;
 }
 
-std::vector<std::filesystem::path> glob(const std::string &pathname,
-                                        bool recursive = false, bool dironly = false) {
-  std::vector<std::filesystem::path> result;
+std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
+                           bool dironly = false) {
+  std::vector<fs::path> result;
 
-  const auto path = std::filesystem::path(pathname);
+  const auto path = fs::path(pathname);
   auto dirname = path.parent_path();
   const auto basename = path.filename();
 
   // if (dirname.empty()) {
-  //   dirname = std::filesystem::current_path();
+  //   dirname = fs::current_path();
   // }
 
   if (!has_magic(pathname)) {
     assert(!dironly);
     if (!basename.empty()) {
-      if (std::filesystem::exists(path)) {
+      if (fs::exists(path)) {
         result.push_back(path);
       }
     } else {
       // Patterns ending with a slash should match only directories
-      if (std::filesystem::is_directory(dirname)) {
+      if (fs::is_directory(dirname)) {
         result.push_back(path);
       }
     }
@@ -287,15 +284,14 @@ std::vector<std::filesystem::path> glob(const std::string &pathname,
     }
   }
 
-  std::vector<std::filesystem::path> dirs;
-  if (dirname != std::filesystem::path(pathname) && has_magic(dirname.string())) {
+  std::vector<fs::path> dirs;
+  if (dirname != fs::path(pathname) && has_magic(dirname.string())) {
     dirs = details::glob(dirname, recursive, true);
   } else {
     dirs = {dirname};
   }
 
-  std::function<std::vector<std::filesystem::path>(const std::filesystem::path &,
-                                                   const std::filesystem::path &, bool)>
+  std::function<std::vector<fs::path>(const fs::path &, const fs::path &, bool)>
       glob_in_dir;
   if (has_magic(basename.string())) {
     if (recursive && is_recursive(basename.string())) {
@@ -309,7 +305,7 @@ std::vector<std::filesystem::path> glob(const std::string &pathname,
 
   for (auto &d : dirs) {
     for (auto &name : glob_in_dir(d, basename, dironly)) {
-      result.push_back(std::filesystem::absolute(name));
+      result.push_back(fs::absolute(name));
     }
   }
 
@@ -318,11 +314,11 @@ std::vector<std::filesystem::path> glob(const std::string &pathname,
 
 } // namespace details
 
-std::vector<std::filesystem::path> glob(const std::string &pathname) {
+std::vector<fs::path> glob(const std::string &pathname) {
   return details::glob(pathname, false);
 }
 
-std::vector<std::filesystem::path> rglob(const std::string &pathname) {
+std::vector<fs::path> rglob(const std::string &pathname) {
   return details::glob(pathname, true);
 }
 
