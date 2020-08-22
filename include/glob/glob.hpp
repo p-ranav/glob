@@ -17,7 +17,7 @@ namespace glob {
 // shell-style wildcards. Broken symlinks are included in the results (as in the shell).
 std::vector<std::filesystem::path> glob(const std::string &pathname);
 
-// Similar to glob.
+// Globs recursively
 // The pattern “**” will match any files and zero or more directories, subdirectories and
 // symbolic links to directories.
 std::vector<std::filesystem::path> rglob(const std::string &pathname);
