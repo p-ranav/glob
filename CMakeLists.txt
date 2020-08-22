@@ -44,7 +44,7 @@ file(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/
 # INTERFACE_COMPILE_FEATURES cxx_std_17)
 
 add_library(Glob ${headers} ${sources})
-
+SET_TARGET_PROPERTIES(Glob PROPERTIES OUTPUT_NAME glob)
 set_target_properties(Glob PROPERTIES CXX_STANDARD 17)
 
 # being a cross-platform target, we enforce standards conformance on MSVC
