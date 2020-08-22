@@ -62,10 +62,6 @@ for (auto& p : glob::rglob("**/*.hpp")) {
 
 ## API
 
-* No tilde expansion is done but `*`, `?`, and character ranges expressed with `[]` will be correctly matched.
-* For a literal match, wrap the meta-characters in brackets. For example, `[?]` matches the character `?`.
-* With `rglob`, the pattern `**` will match any files and zero or more directories, subdirectories and symbolic links to directories.
-
 ```cpp
 /// e.g., glob("*.hpp")
 /// e.g., glob("**/*.cpp")
