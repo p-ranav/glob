@@ -84,7 +84,7 @@ There are also two convenience functions to `glob` on a list of patterns:
 vector<filesystem::path> glob(vector<string> pathnames);
 
 /// Globs recursively
-/// e.g., rglob({"*.png", "*.jpg", "*.tiff"})
+/// e.g., rglob({"**/*.h", "**/*.hpp", "**/*.cpp"})
 vector<filesystem::path> rglob(vector<string> pathnames);
 ```
 
