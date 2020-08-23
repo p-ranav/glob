@@ -26,9 +26,11 @@
 
 ## Quick Start
 
-* This library has 2 files: `glob.h` and `glob.cpp`
-  - No external dependencies - just the standard library
-  - Requires C++17 `std::filesystem`
+* This library is available in two flavors:
+  1. Single header file version in `single_include/`
+  2. Two file version: `glob.h` and `glob.cpp`
+* No external dependencies - just the standard library
+* Requires C++17 `std::filesystem`
   - If you can't use `C++17`, you can integrate [gulrak/filesystem](https://github.com/gulrak/filesystem) with minimal effort.
 * MIT License
 
