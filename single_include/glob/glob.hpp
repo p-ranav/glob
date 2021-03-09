@@ -181,7 +181,12 @@ bool has_magic(const std::string &pathname) {
 }
 
 static inline 
-bool is_hidden(const std::string &pathname) { return pathname[0] == '.'; }
+bool is_hidden(const std::string &pathname) {
+  // path is hidden if it starts with dot and is not parent dir nor current dir
+  if (pathname.size() >= 2)
+    return pathname.at(0) == '.' && pathname.at(1) != '.' && pathname.at(1) != '/';
+  return pathname[0] == '.';
+}
 
 static inline 
 bool is_recursive(const std::string &pattern) { return pattern == "**"; }
