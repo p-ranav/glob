@@ -181,7 +181,9 @@ bool has_magic(const std::string &pathname) {
 }
 
 static inline 
-bool is_hidden(const std::string &pathname) { return pathname[0] == '.'; }
+bool is_hidden(const std::string &pathname) {
+  return std::regex_match(pathname, std::regex("^(.*\\/)*\\.[^\\.\\/]+\\/*$"));
+}
 
 static inline 
 bool is_recursive(const std::string &pattern) { return pattern == "**"; }
