@@ -182,10 +182,7 @@ bool has_magic(const std::string &pathname) {
 
 static inline 
 bool is_hidden(const std::string &pathname) {
-  // path is hidden if it starts with dot and is not parent dir nor current dir
-  if (pathname.size() >= 2)
-    return pathname.at(0) == '.' && pathname.at(1) != '.' && pathname.at(1) != '/';
-  return pathname[0] == '.';
+  return std::regex_match(pathname, std::regex("^(.*\\/)*\\.[^\\.\\/]+\\/*$"));
 }
 
 static inline 
