@@ -216,11 +216,11 @@ std::vector<fs::path> rlistdir(const fs::path &dirname, bool dironly) {
 
 // This helper function recursively yields relative pathnames inside a literal
 // directory.
-std::vector<fs::path> glob2(const fs::path &dirname, const std::string &pattern,
+std::vector<fs::path> glob2(const fs::path &dirname, const fs::path &pattern,
                             bool dironly) {
   // std::cout << "In glob2\n";
   std::vector<fs::path> result;
-  assert(is_recursive(pattern));
+  assert(is_recursive(pattern.string()));
   for (auto &dir : rlistdir(dirname, dironly)) {
     result.push_back(dir);
   }
@@ -231,7 +231,7 @@ std::vector<fs::path> glob2(const fs::path &dirname, const std::string &pattern,
 // They return a list of basenames.  _glob1 accepts a pattern while _glob0
 // takes a literal basename (so it only has to check for its existence).
 
-std::vector<fs::path> glob1(const fs::path &dirname, const std::string &pattern,
+std::vector<fs::path> glob1(const fs::path &dirname, const fs::path &pattern,
                             bool dironly) {
   // std::cout << "In glob1\n";
   auto names = iter_directory(dirname, dironly);
@@ -248,7 +248,7 @@ std::vector<fs::path> glob1(const fs::path &dirname, const std::string &pattern,
       // }
     }
   }
-  return filter(filtered_names, pattern);
+  return filter(filtered_names, pattern.string());
 }
 
 std::vector<fs::path> glob0(const fs::path &dirname, const fs::path &basename,
@@ -268,10 +268,11 @@ std::vector<fs::path> glob0(const fs::path &dirname, const fs::path &basename,
   return result;
 }
 
-std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
+std::vector<fs::path> glob(const fs::path &inpath, bool recursive = false,
                            bool dironly = false) {
   std::vector<fs::path> result;
 
+  const auto pathname = inpath.string();
   auto path = fs::path(pathname);
 
   if (pathname[0] == '~') {
