@@ -98,7 +98,7 @@ vector<filesystem::path> rglob(vector<string> pathnames);
 | `?` | any one character | `???` matches files with 3 characters long |
 | `[]` | any character listed in the brackets | `[ABC]*` matches files starting with A,B or C | 
 | `[-]` | any character in the range listed in brackets | `[A-Z]*` matches files starting with capital letters |
-| `[!]` | any character listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
+| `[!]` | any character not listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
 
 ## Examples
 
