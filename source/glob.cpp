@@ -69,7 +69,7 @@ std::string translate(const std::string &pattern) {
           chunks.push_back(std::string(pattern.begin() + i, pattern.begin() + j));
           // Escape backslashes and hyphens for set difference (--).
           // Hyphens that create ranges shouldn't be escaped.
-          bool first = false;
+          bool first = true;
           for (auto &s : chunks) {
             string_replace(s, std::string{"\\"}, std::string{R"(\\)"});
             string_replace(s, std::string{"-"}, std::string{R"(\-)"});
