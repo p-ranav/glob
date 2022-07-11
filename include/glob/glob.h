@@ -34,4 +34,7 @@ std::vector<std::filesystem::path> glob(const std::initializer_list<std::string>
 /// Initializer list overload for convenience
 std::vector<std::filesystem::path> rglob(const std::initializer_list<std::string> &pathnames);
 
+/// Returns true if the input path matche the glob pattern
+  bool fnmatch(const std::filesystem::path &name, const std::string &pattern);
+
 } // namespace glob
