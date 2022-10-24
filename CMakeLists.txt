@@ -9,6 +9,9 @@ project(
   LANGUAGES CXX
 )
 
+# ---- Options ----
+option(GLOB_USE_GHC_FILESYSTEM "Use ghc::filesystem instead of std::filesystem" OFF)
+
 # ---- Include guards ----
 
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
@@ -46,6 +49,12 @@ file(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/
 add_library(Glob ${headers} ${sources})
 SET_TARGET_PROPERTIES(Glob PROPERTIES OUTPUT_NAME glob)
 set_target_properties(Glob PROPERTIES CXX_STANDARD 17)
+
+if ( GLOB_USE_GHC_FILESYSTEM )
+  # Switch to ghc::filesystem.
+  target_link_libraries(Glob PRIVATE ghcFilesystem::ghc_filesystem)
+  target_compile_definitions(Glob PUBLIC GLOB_USE_GHC_FILESYSTEM)
+endif()
 
 # being a cross-platform target, we enforce standards conformance on MSVC
 target_compile_options(Glob PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")

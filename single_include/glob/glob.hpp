@@ -1,7 +1,6 @@
 
 #pragma once
 #include <cassert>
-#include <filesystem>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -9,9 +8,19 @@
 #include <string>
 #include <vector>
 
+#ifdef GLOB_USE_GHC_FILESYSTEM
+#include <ghc/filesystem.hpp>
+#else
+#include <filesystem>
+#endif
+
 namespace glob {
 
+#ifdef GLOB_USE_GHC_FILESYSTEM
+namespace fs = ghc::filesystem;
+#else
 namespace fs = std::filesystem;
+#endif
 
 namespace {
 
