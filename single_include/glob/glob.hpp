@@ -8,9 +8,10 @@
 #include <regex>
 #include <string>
 #include <vector>
-namespace fs = std::filesystem;
 
 namespace glob {
+
+namespace fs = std::filesystem;
 
 namespace {
 
@@ -374,8 +375,8 @@ std::vector<fs::path> rglob(const std::string &pathname) {
 }
 
 static inline 
-std::vector<std::filesystem::path> glob(const std::vector<std::string> &pathnames) {
-  std::vector<std::filesystem::path> result;
+std::vector<fs::path> glob(const std::vector<std::string> &pathnames) {
+  std::vector<fs::path> result;
   for (auto &pathname : pathnames) {
     for (auto &match : glob(pathname, false)) {
       result.push_back(std::move(match));
@@ -385,8 +386,8 @@ std::vector<std::filesystem::path> glob(const std::vector<std::string> &pathname
 }
 
 static inline 
-std::vector<std::filesystem::path> rglob(const std::vector<std::string> &pathnames) {
-  std::vector<std::filesystem::path> result;
+std::vector<fs::path> rglob(const std::vector<std::string> &pathnames) {
+  std::vector<fs::path> result;
   for (auto &pathname : pathnames) {
     for (auto &match : glob(pathname, true)) {
       result.push_back(std::move(match));
@@ -396,13 +397,13 @@ std::vector<std::filesystem::path> rglob(const std::vector<std::string> &pathnam
 }
 
 static inline 
-std::vector<std::filesystem::path>
+std::vector<fs::path>
 glob(const std::initializer_list<std::string> &pathnames) {
   return glob(std::vector<std::string>(pathnames));
 }
 
 static inline 
-std::vector<std::filesystem::path>
+std::vector<fs::path>
 rglob(const std::initializer_list<std::string> &pathnames) {
   return rglob(std::vector<std::string>(pathnames));
 }
