@@ -164,13 +164,13 @@ std::vector<fs::path> filter(const std::vector<fs::path> &names,
 static inline 
 fs::path expand_tilde(fs::path path) {
   if (path.empty()) return path;
+
 #ifdef _WIN32
-  char* home;
-  size_t sz;
-  _dupenv_s(&home, &sz, "USERPROFILE");
+  const char * home_variable = "USERNAME";
 #else
-  const char * home = std::getenv("HOME");
+  const char * home_variable = "USER";
 #endif
+  const char * home = std::getenv(home_variable);
   if (home == nullptr) {
     throw std::invalid_argument("error: Unable to expand `~` - HOME environment variable not set.");
   }
