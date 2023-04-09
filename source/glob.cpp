@@ -224,7 +224,7 @@ std::vector<fs::path> rlistdir(const fs::path &dirname, bool dironly) {
 std::vector<fs::path> glob2(const fs::path &dirname, [[maybe_unused]] const fs::path &pattern,
                             bool dironly) {
   // std::cout << "In glob2\n";
-  std::vector<fs::path> result;
+  std::vector<fs::path> result{"."};
   assert(is_recursive(pattern.string()));
   for (auto &dir : rlistdir(dirname, dironly)) {
     result.push_back(dir);
@@ -336,7 +336,7 @@ std::vector<fs::path> glob(const fs::path &inpath, bool recursive = false,
       if (name.parent_path().empty()) {
         subresult = d / name;
       }
-      result.push_back(subresult);
+      result.push_back(subresult.lexically_normal());
     }
   }
 
