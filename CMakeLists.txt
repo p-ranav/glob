@@ -9,6 +9,11 @@ project(
   LANGUAGES CXX
 )
 
+set(GLOB_MAIN_PROJECT FALSE)
+if ((CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR) AND (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME))
+  set(GLOB_MAIN_PROJECT TRUE)
+endif()
+
 # ---- Options ----
 option(GLOB_USE_GHC_FILESYSTEM "Use ghc::filesystem instead of std::filesystem" OFF)
 
@@ -24,14 +29,16 @@ endif()
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
 
-include(cmake/CPM.cmake)
+if (GLOB_MAIN_PROJECT)
+  include(cmake/CPM.cmake)
 
-# PackageProject.cmake will be used to make our target installable
-CPMAddPackage(
-  NAME PackageProject.cmake
-  GITHUB_REPOSITORY TheLartians/PackageProject.cmake
-  VERSION 1.3
-)
+  # PackageProject.cmake will be used to make our target installable
+  CPMAddPackage(
+    NAME PackageProject.cmake
+    GITHUB_REPOSITORY TheLartians/PackageProject.cmake
+    VERSION 1.3
+  )
+endif()
 
 # ---- Add source files ----
 
@@ -73,12 +80,14 @@ target_include_directories(
 # header paths
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
 
-packageProject(
-  NAME ${PROJECT_NAME}
-  VERSION ${PROJECT_VERSION}
-  BINARY_DIR ${PROJECT_BINARY_DIR}
-  INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include
-  INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
-  VERSION_HEADER "${VERSION_HEADER_LOCATION}"
-  DEPENDENCIES ""
-)
+if (GLOB_MAIN_PROJECT)
+  packageProject(
+    NAME ${PROJECT_NAME}
+    VERSION ${PROJECT_VERSION}
+    BINARY_DIR ${PROJECT_BINARY_DIR}
+    INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include
+    INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
+    VERSION_HEADER "${VERSION_HEADER_LOCATION}"
+    DEPENDENCIES ""
+  )
+endif()
