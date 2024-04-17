@@ -45,7 +45,4 @@ std::vector<fs::path> glob(const std::initializer_list<std::string> &pathnames);
 /// Initializer list overload for convenience
 std::vector<fs::path> rglob(const std::initializer_list<std::string> &pathnames);
 
-/// Returns true if the input path matche the glob pattern
-  bool fnmatch(const fs::path &name, const std::string &pattern);
-
 } // namespace glob
