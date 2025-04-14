@@ -223,7 +223,11 @@ std::vector<fs::path> rlistdir(const fs::path &dirname, bool dironly) {
 std::vector<fs::path> glob2(const fs::path &dirname, [[maybe_unused]] const fs::path &pattern,
                             bool dironly) {
   // std::cout << "In glob2\n";
-  std::vector<fs::path> result{"."};
+  std::vector<fs::path> result;
+  // look into the base directory as well, but only if it exists
+  if (fs::exists(dirname)) {
+    result.push_back(".");
+  }
   assert(is_recursive(pattern.string()));
   auto matched_dirs = rlistdir(dirname, dironly);
   std::copy(std::make_move_iterator(matched_dirs.begin()), std::make_move_iterator(matched_dirs.end()), std::back_inserter(result));

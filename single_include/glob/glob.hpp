@@ -252,6 +252,10 @@ std::vector<fs::path> glob2(const fs::path &dirname, [[maybe_unused]] const std:
                             bool dironly) {
   // std::cout << "In glob2\n";
   std::vector<fs::path> result;
+  // look into the base directory as well, but only if it exists
+  if (fs::exists(dirname)) {
+    result.push_back(".");
+  }
   assert(is_recursive(pattern));
   for (auto &dir : rlistdir(dirname, dironly)) {
     result.push_back(dir);
@@ -364,7 +368,7 @@ std::vector<fs::path> glob(const std::string &pathname, bool recursive = false,
       if (name.parent_path().empty()) {
         subresult = d / name;
       }
-      result.push_back(subresult);
+      result.push_back(subresult.lexically_normal());
     }
   }
 
