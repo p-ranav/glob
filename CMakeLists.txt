@@ -10,6 +10,7 @@ project(
 
 # ---- Options ----
 option(GLOB_USE_GHC_FILESYSTEM "Use ghc::filesystem instead of std::filesystem" OFF)
+option(BUILD_TESTING "Build tests" OFF)
 
 # ---- Include guards ----
 
@@ -32,6 +33,7 @@ CPMAddPackage(
         VERSION 1.3
 )
 
+if(BUILD_TESTING)
 CPMAddPackage(
         NAME googletest
         GITHUB_REPOSITORY google/googletest
@@ -41,6 +43,7 @@ CPMAddPackage(
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+endif()
 
 # ---- Add source files ----
 
@@ -93,6 +96,7 @@ packageProject(
 )
 
 # --- setup tests ---
+if(BUILD_TESTING)
 enable_testing()
 
 add_executable(glob_tests test/rglob_test.cpp)
@@ -106,3 +110,4 @@ target_compile_definitions(glob_tests_single PRIVATE USE_SINGLE_HEADER=1)
 target_link_libraries(glob_tests_single PRIVATE gtest_main)
 target_include_directories(glob_tests_single PRIVATE single_include)
 add_test(NAME glob_tests_single COMMAND glob_tests_single)
+endif()
