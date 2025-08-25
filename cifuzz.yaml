@@ -1,0 +1,74 @@
+## Configuration for a CI Fuzz project
+## Generated on 2025-08-25
+
+## The build system used to build this project. If not set, cifuzz tries to
+## detect the build system automatically.
+## Valid values: "bazel", "cmake", "other"
+build-system: cmake
+## Engine used for fuzzing, default is "libfuzzer-clang".
+## Valid values: "libfuzzer-clang", "honggfuzz-clang", "honggfuzz-gcc"
+engine: libfuzzer-clang
+## Sanitizers to use when building fuzz tests. If not set, ASan and UBSan
+## are used by default.
+#sanitizers:
+# - address
+# - undefined
+
+## If the build system type is "other", this command is used to build the fuzz
+## tests.
+#build-command: make my_fuzz_test
+
+## If the build system type is "other", this command is used to list the names
+## of already existing fuzz tests in your project. This allows running all fuzz
+## tests in the project without listing them explicitly, supports fuzz test
+## generation and enables fuzz test completion for commands.
+## The listed names should be separated by whitespace and can't include
+## whitespaces themselves, i.e. 'fuzz_test1 fuzz_test_2 ...'
+#list-fuzz-tests-command: echo my_fuzz_test
+
+## Command-line arguments to pass directly to the build system to use when
+## building fuzz tests.
+#build-system-args:
+# - -DBUILD_TESTS=ON
+
+## Directories containing sample inputs used as seeds for running fuzz tests.
+## For general information on seed corpora, see:
+## https://docs.code-intelligence.com/glossary#seed-corpus
+#seed-corpus-dirs:
+# - path/to/seed-corpus
+
+## Directories containing inputs for calculating coverage. These are used in
+## addition to inputs found in the directory of the fuzz test.
+#corpus-dirs:
+# - path/to/corpus
+
+## File containing input language keywords or other interesting byte sequences
+## used for running fuzz tests.
+## For libFuzzer see: https://llvm.org/docs/LibFuzzer.html#dictionaries
+#dict: path/to/dictionary.dct
+
+## Command-line arguments to pass to libFuzzer when running fuzz tests.
+## See https://llvm.org/docs/LibFuzzer.html#options for possible options.
+#libfuzzer-args:
+# - -rss_limit_mb=4096
+
+## Command-line arguments to pass to Honggfuzz when running fuzz tests.
+## See https://github.com/google/honggfuzz/blob/master/docs/USAGE.md for possible options.
+#honggfuzz-args:
+# - --rlimit_rss=4096
+
+## Maximum time to run all fuzz tests. Default is 10 minutes. The time will be
+## split up evenly between multiple fuzz tests. To keep running indefinitely,
+## set value to 0.
+#max-fuzzing-duration: 30m
+
+## Set to true to print output of the `cifuzz run` command as JSON.
+#print-json: true
+
+## Set to true to disable desktop notifications.
+#no-notifications: true
+
+## Set style for command output.
+## Valid values: "pretty", "plain"
+#style: plain
+build-file: cifuzz-spark/CMakeLists.txt

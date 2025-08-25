@@ -23,109 +23,142 @@ bool string_replace(std::string &str, std::string_view from, std::string_view to
   return true;
 }
 
+inline void handle_previous_stars(std::string &result_string, const int &n_stars) {
+  if (n_stars == 1) {
+    // single star cannot escape "/"
+    result_string += "[^/]*"; // .* without /
+  } else if (n_stars == 2) {
+    // double star matches anything
+    result_string += ".*";
+  }
+}
+
 std::string translate(std::string_view pattern) {
   std::size_t i = 0, n = pattern.size();
   std::string result_string;
 
+  int n_stars = 0;
+
   while (i < n) {
     auto c = pattern[i];
     i += 1;
+
     if (c == '*') {
-      result_string += ".*";
-    } else if (c == '?') {
-      result_string += ".";
-    } else if (c == '[') {
-      auto j = i;
-      if (j < n && pattern[j] == '!') {
-        j += 1;
-      }
-      if (j < n && pattern[j] == ']') {
-        j += 1;
-      }
-      while (j < n && pattern[j] != ']') {
-        j += 1;
-      }
-      if (j >= n) {
-        result_string += "\\[";
-      } else {
-        auto stuff = std::string(pattern.begin() + i, pattern.begin() + j);
-        if (stuff.find("--") == std::string::npos) {
-          string_replace(stuff, std::string_view{"\\"}, std::string_view{R"(\\)"});
-        } else {
-          std::vector<std::string> chunks;
-          std::size_t k = 0;
-          if (pattern[i] == '!') {
-            k = i + 2;
-          } else {
-            k = i + 1;
-          }
-
-          while (true) {
-            k = pattern.find("-", k, j);
-            if (k == std::string_view::npos) {
-              break;
-            }
-            chunks.push_back(std::string(pattern.begin() + i, pattern.begin() + k));
-            i = k + 1;
-            k = k + 3;
-          }
-
-          chunks.push_back(std::string(pattern.begin() + i, pattern.begin() + j));
-          // Escape backslashes and hyphens for set difference (--).
-          // Hyphens that create ranges shouldn't be escaped.
-          bool first = true;
-          for (auto &chunk : chunks) {
-            string_replace(chunk, std::string_view{"\\"}, std::string_view{R"(\\)"});
-            string_replace(chunk, std::string_view{"-"}, std::string_view{R"(\-)"});
-            if (first) {
-              stuff += chunk;
-              first = false;
-            } else {
-              stuff += "-" + chunk;
-            }
-          }
-        }
-
-        // Escape set operations (&&, ~~ and ||).
-        std::string result{};
-        std::regex_replace(std::back_inserter(result), // result
-                           stuff.begin(), stuff.end(), // string
-                           ESCAPE_SET_OPER,            // pattern
-                           ESCAPE_REPL_STR);           // repl
-        stuff = result;
-        i = j + 1;
-        if (stuff[0] == '!') {
-          stuff = "^" + std::string(stuff.begin() + 1, stuff.end());
-        } else if (stuff[0] == '^' || stuff[0] == '[') {
-          stuff = "\\\\" + stuff;
-        }
-        result_string = result_string + "[" + stuff + "]";
+      n_stars++;
+      // last character of the pattern is a star
+      if (i == n) {
+        handle_previous_stars(result_string, n_stars);
       }
     } else {
-      // SPECIAL_CHARS
-      // closing ')', '}' and ']'
-      // '-' (a range in character set)
-      // '&', '~', (extended character set operations)
-      // '#' (comment) and WHITESPACE (ignored) in verbose mode
-      static std::map<int, std::string> special_characters_map;
-      if (special_characters_map.empty()) {
-        for (auto &&sc : SPECIAL_CHARACTERS) {
-          special_characters_map.emplace(static_cast<int>(sc), std::string{"\\"} + std::string(1, sc));
+      if (n_stars == 1) {
+        // single star cannot escape "/"
+        result_string += "[^/]*"; // .* without /
+      }
+      if (c == '/') {
+        if (n_stars == 2) {
+          // handle **/
+          result_string += "(.*?/)?";
+        } else {
+          result_string += "/";
         }
-      }
+      } else { // not /
+        handle_previous_stars(result_string, n_stars);
+        if (c == '?') {
+          result_string += ".";
+        } else if (c == '[') {
+          auto j = i;
+          if (j < n && pattern[j] == '!') {
+            j += 1;
+          }
+          if (j < n && pattern[j] == ']') {
+            j += 1;
+          }
+          while (j < n && pattern[j] != ']') {
+            j += 1;
+          }
+          if (j >= n) {
+            result_string += "\\[";
+          } else {
+            auto stuff = std::string(pattern.begin() + i, pattern.begin() + j);
+            if (stuff.find("--") == std::string::npos) {
+              string_replace(stuff, std::string_view{"\\"}, std::string_view{R"(\\)"});
+            } else {
+              std::vector<std::string> chunks;
+              std::size_t k = 0;
+              if (pattern[i] == '!') {
+                k = i + 2;
+              } else {
+                k = i + 1;
+              }
 
-      if (SPECIAL_CHARACTERS.find(c) != std::string_view::npos) {
-        result_string += special_characters_map[static_cast<int>(c)];
-      } else {
-        result_string += c;
-      }
-    }
+              while (k < j) {
+                auto pos = pattern.substr(k, j - k).find('-');
+                if (pos == std::string_view::npos) {
+                  break;
+                } else {
+                    k += pos;
+                }
+                chunks.push_back(std::string(pattern.begin() + i, pattern.begin() + k));
+                i = k + 1;
+                k += 3;
+              }
+
+              chunks.push_back(std::string(pattern.begin() + i, pattern.begin() + j));
+              // Escape backslashes and hyphens for set difference (--).
+              // Hyphens that create ranges shouldn't be escaped.
+              bool first = true;
+              for (auto &chunk : chunks) {
+                string_replace(chunk, std::string_view{"\\"}, std::string_view{R"(\\)"});
+                string_replace(chunk, std::string_view{"-"}, std::string_view{R"(\-)"});
+                if (first) {
+                  stuff += chunk;
+                  first = false;
+                } else {
+                  stuff += "-" + chunk;
+                }
+              }
+            }
+
+            // Escape set operations (&&, ~~ and ||).
+            std::string result{};
+            std::regex_replace(std::back_inserter(result), // result
+                               stuff.begin(), stuff.end(), // string
+                               ESCAPE_SET_OPER,            // pattern
+                               ESCAPE_REPL_STR);           // repl
+            stuff = result;
+            i = j + 1;
+            if (stuff[0] == '!') {
+              stuff = "^" + std::string(stuff.begin() + 1, stuff.end());
+            } else if (stuff[0] == '^' || stuff[0] == '[') {
+              stuff = "\\\\" + stuff;
+            }
+            result_string = result_string + "[" + stuff + "]";
+          }
+        } else {
+          // SPECIAL_CHARS
+          // closing ')', '}' and ']'
+          // '-' (a range in character set)
+          // '&', '~', (extended character set operations)
+          // '#' (comment) and WHITESPACE (ignored) in verbose mode
+          static std::map<int, std::string> special_characters_map;
+          if (special_characters_map.empty()) {
+            for (auto &&sc : SPECIAL_CHARACTERS) {
+              special_characters_map.emplace(static_cast<int>(sc), std::string{"\\"} + std::string(1, sc));
+            }
+          }
+
+          if (SPECIAL_CHARACTERS.find(c) != std::string_view::npos) {
+            result_string += special_characters_map[static_cast<int>(c)];
+          } else {
+            result_string += c;
+          }
+        }
+      } // not /
+      n_stars = 0;
+    } // not *
   }
-  return std::string{"(("} + result_string + std::string{R"()|[\r\n])$)"};
-}
 
-std::regex compile_pattern(std::string_view pattern) {
-  return std::regex(translate(pattern), std::regex::ECMAScript);
+  return std::string{"(("} + result_string + std::string{R"()|[\r\n])$)"};
 }
 
 bool fnmatch(std::string&& name, const std::regex& pattern) {
@@ -135,7 +168,7 @@ bool fnmatch(std::string&& name, const std::regex& pattern) {
 std::vector<fs::path> filter(const std::vector<fs::path> &names,
                              std::string_view pattern) {
   // std::cout << "Pattern: " << pattern << "\n";
-  const auto pattern_re = compile_pattern(pattern);
+  const auto pattern_re = compile_pattern_to_regex(pattern);
   std::vector<fs::path> result;
   std::copy_if(std::make_move_iterator(names.begin()), std::make_move_iterator(names.end()),
                std::back_inserter(result),
@@ -386,4 +419,7 @@ rglob(const std::initializer_list<std::string> &pathnames) {
   return rglob(std::vector<std::string>(pathnames));
 }
 
+std::regex compile_pattern_to_regex(std::string_view pattern) {
+  return std::regex(translate(pattern), std::regex::ECMAScript);
+}
 } // namespace glob

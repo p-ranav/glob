@@ -272,3 +272,8 @@ analysis-cppcheck-build-dir
 ideas
 
 desktop.iniimages/
+
+.cifuzz*/
+.sarif/
+build-vscode/
+lcov.info

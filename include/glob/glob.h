@@ -2,6 +2,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <regex>
 
 #ifdef GLOB_USE_GHC_FILESYSTEM
 #include <ghc/filesystem.hpp>
@@ -45,4 +46,5 @@ std::vector<fs::path> glob(const std::initializer_list<std::string> &pathnames);
 /// Initializer list overload for convenience
 std::vector<fs::path> rglob(const std::initializer_list<std::string> &pathnames);
 
+std::regex compile_pattern_to_regex(std::string_view pattern);
 } // namespace glob

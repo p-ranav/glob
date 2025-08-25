@@ -138,13 +138,13 @@ std::string translate(const std::string &pattern) {
 }
 
 static inline 
-std::regex compile_pattern(const std::string &pattern) {
+std::regex compile_pattern_to_regex(const std::string &pattern) {
   return std::regex(translate(pattern), std::regex::ECMAScript);
 }
 
 static inline 
 bool fnmatch(const fs::path &name, const std::string &pattern) {
-  return std::regex_match(name.string(), compile_pattern(pattern));
+  return std::regex_match(name.string(), compile_pattern_to_regex(pattern));
 }
 
 static inline 
