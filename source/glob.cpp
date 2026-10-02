@@ -167,9 +167,9 @@ fs::path expand_tilde(fs::path path) {
   if (path.empty()) return path;
 
 #ifdef _WIN32
-    const char * home_variable = "USERNAME";
+    const char * home_variable = "USERPROFILE";
 #else
-    const char * home_variable = "USER";
+    const char * home_variable = "HOME";
 #endif
   std::string home = get_env(home_variable);
   
