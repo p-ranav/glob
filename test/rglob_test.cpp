@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
@@ -47,4 +49,60 @@ TEST(rglobTest, Issue3) {
   EXPECT_EQ(matches[0].string(), (temp_dir / "file.txt").string());
   EXPECT_EQ(matches[1].string(), (sub1 / "file.txt").string());
   EXPECT_EQ(matches[2].string(), (sub2 / "file.txt").string());
+}
+
+namespace {
+std::vector<fs::path> sorted_paths(std::vector<fs::path> paths) {
+  std::sort(paths.begin(), paths.end());
+  return paths;
+}
+
+class RecursiveCurrentDirectoryTest : public ::testing::Test {
+protected:
+  fs::path original_directory;
+  fs::path root;
+  bool created = false;
+
+  void SetUp() override {
+    original_directory = fs::current_path();
+    root = fs::temp_directory_path() /
+           ("glob_cwd_" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+    created = fs::create_directory(root);
+    ASSERT_TRUE(created);
+    fs::create_directories(root / "sub" / "nested");
+    std::ofstream(root / "root.txt").close();
+    std::ofstream(root / "sub" / "root.txt").close();
+    std::ofstream(root / "sub" / "nested" / "deep.txt").close();
+    fs::current_path(root);
+  }
+
+  void TearDown() override {
+    fs::current_path(original_directory);
+    if (created) fs::remove_all(root);
+  }
+};
+} // namespace
+
+TEST_F(RecursiveCurrentDirectoryTest, WildcardIncludesCurrentDirectory) {
+  const auto expected = sorted_paths({"root.txt", "sub/root.txt", "sub/nested/deep.txt"});
+  EXPECT_EQ(sorted_paths(glob::rglob("**/*.txt")), expected);
+  EXPECT_EQ(sorted_paths(glob::rglob("./**/*.txt")), expected);
+  EXPECT_EQ(sorted_paths(glob::rglob((root / "**" / "*.txt").string())),
+            sorted_paths({root / "root.txt", root / "sub/root.txt", root / "sub/nested/deep.txt"}));
+  EXPECT_EQ(sorted_paths(glob::glob("**/*.txt")), sorted_paths({"sub/root.txt"}));
+  EXPECT_TRUE(glob::rglob("missing/**/*.txt").empty());
+}
+
+TEST_F(RecursiveCurrentDirectoryTest, LiteralIncludesCurrentDirectory) {
+  EXPECT_EQ(sorted_paths(glob::rglob("**/root.txt")), sorted_paths({"root.txt", "sub/root.txt"}));
+  EXPECT_TRUE(glob::rglob("**/absent.txt").empty());
+}
+
+TEST_F(RecursiveCurrentDirectoryTest, TerminalRecursivePatternIncludesBase) {
+  EXPECT_EQ(sorted_paths(glob::rglob("**")),
+            sorted_paths({".", "root.txt", "sub", "sub/root.txt", "sub/nested", "sub/nested/deep.txt"}));
+  EXPECT_EQ(sorted_paths(glob::rglob("**/")), sorted_paths({".", "sub/", "sub/nested/"}));
+  EXPECT_EQ(sorted_paths(glob::rglob("sub/**")),
+            sorted_paths({"sub/", "sub/root.txt", "sub/nested", "sub/nested/deep.txt"}));
+  EXPECT_TRUE(glob::rglob("missing/**").empty());
 }
