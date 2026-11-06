@@ -106,3 +106,27 @@ TEST_F(RecursiveCurrentDirectoryTest, TerminalRecursivePatternIncludesBase) {
             sorted_paths({"sub/", "sub/root.txt", "sub/nested", "sub/nested/deep.txt"}));
   EXPECT_TRUE(glob::rglob("missing/**").empty());
 }
+
+// hidden names are skipped unless the pattern itself starts with a dot, like Python
+TEST(globTest, HiddenFiles) {
+  auto root = fs::temp_directory_path() /
+              ("glob_hidden_" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+  ASSERT_TRUE(fs::create_directories(root / "sub"));
+  std::ofstream(root / "visible").close();
+  std::ofstream(root / ".hidden").close();
+  std::ofstream(root / "sub" / "visible").close();
+  std::ofstream(root / "sub" / ".hidden").close();
+  std::ofstream(root / "sub" / ".hidden.txt").close();
+
+  auto base = root.string() + "/";
+  EXPECT_EQ(sorted_paths(glob::glob(base + "*")),
+            sorted_paths({root / "sub", root / "visible"}));
+  EXPECT_EQ(sorted_paths(glob::glob(base + ".*")), sorted_paths({root / ".hidden"}));
+  EXPECT_EQ(sorted_paths(glob::glob(base + "sub/*")), sorted_paths({root / "sub" / "visible"}));
+  EXPECT_EQ(sorted_paths(glob::glob(base + "sub/.*")),
+            sorted_paths({root / "sub" / ".hidden", root / "sub" / ".hidden.txt"}));
+  EXPECT_EQ(sorted_paths(glob::rglob(base + "**/*")),
+            sorted_paths({root / "sub", root / "sub" / "visible", root / "visible"}));
+
+  fs::remove_all(root);
+}

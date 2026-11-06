@@ -229,7 +229,7 @@ std::vector<fs::path> rlistdir(const fs::path &dirname, bool dironly) {
   std::vector<fs::path> result;
   auto names = iter_directory(dirname, dironly);
   for (auto &&name : names) {
-    if (!is_hidden(name.string())) {
+    if (!is_hidden(name.filename().string())) {
       result.push_back(name);
       auto matched_dirs = rlistdir(name, dironly);
       std::copy(std::make_move_iterator(matched_dirs.begin()), std::make_move_iterator(matched_dirs.end()), std::back_inserter(result));
@@ -264,8 +264,10 @@ std::vector<fs::path> glob1(const fs::path &dirname, const fs::path &pattern,
   // std::cout << "In glob1\n";
   std::vector<fs::path> filtered_names;
   auto names = iter_directory(dirname, dironly);
+  // like Python, a pattern that starts with a dot may match hidden names
+  const bool pattern_is_hidden = is_hidden(pattern.string());
   for (auto &&name : names) {
-    if (!is_hidden(name.string())) {
+    if (pattern_is_hidden || !is_hidden(name.filename().string())) {
       filtered_names.push_back(name.filename());
       // if (name.is_relative()) {
       //   // std::cout << "Filtered (Relative): " << name << "\n";
